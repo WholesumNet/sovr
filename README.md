@@ -24,7 +24,7 @@ You would need Swarm, FairOS-dfs and the Golem toolsets.
 - Get Swarm node and dfs server up and running as outlined here https://docs.fairos.fairdatasociety.org/docs/  
 - Get Golem tools up and running from here https://handbook.golem.network/requestor-tutorials/flash-tutorial-of-requestor-development
 - Get a virtual environment and install necessary libraries. You'd need typical ones like `yapapi`, `requests`, ...
-- Invoke `python3 cli.py --recipe foo/recipe.json --run`
+- MAke sure the `foo/logs` folder exists and then invoke `python3 cli.py --recipe foo/recipe.json --run`
 - Once Golem is done, observe the contents of the `foo/log` and `foo/output`. Now you can save your compute pod on the dfs with `python3 cli.py --recipe foo/recipe.json --persist`, 
 note that if your recipe file has set the `public` property to `true`, then you'd get a `sharing reference key` that you can pass to the `--fork` command or your friends
 
