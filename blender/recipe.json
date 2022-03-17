@@ -1,0 +1,14 @@
+{
+  "name": "blender",
+  "description": "Blender requestor pod that renders a .blend file.",
+  "version": "1.0",
+  "author": "reza",
+  "public": true,
+  "golem": {
+    "exec": "python3 script/blender.py",
+    "script": "script",
+    "payload": "payload",
+    "output": "output",
+    "log": "logs"
+  }
+}
