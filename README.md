@@ -26,7 +26,8 @@ You would need Swarm, FairOS-dfs and the Golem toolsets.
 - Get a virtual environment and install necessary libraries. You'd need typical ones like `yapapi`, `requests`, ...
 - MAke sure the `foo/logs` folder exists and then invoke `python3 cli.py --recipe foo/recipe.json --run`
 - Once Golem is done, observe the contents of the `foo/log` and `foo/output`. Now you can save your compute pod on the dfs with `python3 cli.py --recipe foo/recipe.json --persist`, 
-note that if your recipe file has set the `public` property to `true`, then you'd get a `sharing reference key` that you can pass to the `--fork` command or your friends
+note that if your recipe file has set the `public` property to `true`, then you'd get a `sharing reference key` that you can pass to the `--fork` command or your friends  
+Another way to start is to fork a template Blender project already shared by us. Invoke `python3 cli.py --fork 2f06c9e6e1a682351104b44f0b6f44714c3d1657ca4e4f03876fbb851913cd76` and wait for it to be pulled into your dfs account and then unpacked inside your current working directory.
 
 ## Demo
 https://www.youtube.com/watch?v=zRPUyUw-5Ek
