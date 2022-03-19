@@ -21,6 +21,13 @@ A compute pod is a directory structure containing a `recipe` file, `script`, `pa
 The `name` property identifies the pod within the dfs. The `public` property is used to share the pod with others. The `golem` property directs how the inputs and outputs of a typical golem session are going to be interacted with. The `exec` property is used to invoke the golem tooling which will use the stuff from the `script` and `payload` properties. The `output` and `log` contain the outputs of a compute session.  
 ## How to run?
 You would need Swarm, FairOS-dfs and the Golem toolsets.  
+- Make sure you have the right credentials for the FairOS-dfs account. CLI expects a `creds.json` file in the same folder with the following structure.  
+  <pre>
+  {
+    "username": "foo",
+    "password": "bar"
+  }
+  </pre>  
 - Get Swarm node and dfs server up and running as outlined here https://docs.fairos.fairdatasociety.org/docs/  
 - Get Golem tools up and running from here https://handbook.golem.network/requestor-tutorials/flash-tutorial-of-requestor-development
 - Get a virtual environment and install necessary libraries. You'd need typical ones like `yapapi`, `requests`, ...
