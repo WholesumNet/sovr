@@ -30,7 +30,7 @@ note that if your recipe file has set the `public` property to `true`, then you'
 
 
 Another way to start is to fork a template Blender project already shared by us. Invoke `python3 cli.py --fork 2f06c9e6e1a682351104b44f0b6f44714c3d1657ca4e4f03876fbb851913cd76` and wait for it to be pulled into your dfs account and then unpacked inside your current working directory.  
-Note that the network should be configured to point `goerli` endpoints.
+Note that the network should be configured to point to `goerli` endpoints.
 
 ## Demo
 https://www.youtube.com/watch?v=zRPUyUw-5Ek
