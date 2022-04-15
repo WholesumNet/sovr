@@ -1,6 +1,6 @@
 # Sovr
 ## Intro
-Sovr is an attempt to integrate the Golem network's compute prowess into the FairOS-dfs and the Swarm network. The whole idea revolves around the concept of compute pods.  With the help of Swarm and dfs the user is in charge of all the stuff required to run a DApp. This project is a small step towards the goal of a sophisticated sovereign exosystem where the incentives of a DApp beat those of centralized/cloud apps. An ocean to a man-made pond is what a dapp are to a capp.  
+Sovr is an attempt to integrate the Golem network's compute prowess into the FairOS-dfs and the Swarm network. The whole idea revolves around the concept of compute pods.  With the help of Swarm and dfs the user is in charge of all the stuff required to run a DApp. This project is a small step towards the goal of a sophisticated sovereign exosystem where the incentives of a DApp beat those of centralized/cloud apps. An ocean to a man-made pond is what a dapp is to a capp.  
 A compute pod is a directory structure containing a `recipe` file, `script`, `payload`, `ouput`, and `log` folders. Here's a sample recipe file:  
 <pre>
 {
