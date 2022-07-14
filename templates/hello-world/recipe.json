@@ -1,0 +1,13 @@
+{
+  "name": "HelloWorld",
+  "description": "A simple HelloWorld app!",
+  "version": "1.0",
+  "author": "reza",
+  "public": true,
+  "golem": {
+    "exec": "python3 script/hello.py",
+    "script": "script",
+    "output": "output",
+    "log": "logs"
+  }
+}

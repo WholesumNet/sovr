@@ -1,0 +1,13 @@
+{
+  "name": "yacat",
+  "description": "HashCat on Golem!",
+  "version": "1.0",
+  "author": "reza",
+  "public": true,
+  "golem": {
+    "exec": "python3 script/yacat.py --mask '?a?a' --hash '$P$5ZDzPE45CigTC6EY4cXbyJSLj/pGee0'",
+    "script": "script",
+    "output": "output",
+    "log": "logs"
+  }
+}
