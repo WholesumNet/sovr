@@ -13,7 +13,7 @@ from yapapi.events import CommandExecuted
 from yapapi.payload import vm
 from yapapi.rest.activity import CommandExecutionError
 
-examples_dir = Path(__file__).resolve().parent
+examples_dir = Path(__file__).resolve().parent.parent
 sys.path.append(str(examples_dir))
 
 from utils import (
@@ -38,7 +38,7 @@ KEYSPACE_TIMEOUT_ALL_TASKS: timedelta = KEYSPACE_TIMEOUT * 2.1
 
 arg_parser = build_parser("Run a hashcat attack (mask mode) on Golem network.")
 arg_parser.set_defaults(
-    log_file=f"hashcat-yapapi-{datetime.now().strftime('%Y-%m-%d_%H.%M.%S')}.log"
+    log_file=f"{examples_dir}/logs/hashcat-yapapi-{datetime.now().strftime('%Y-%m-%d_%H.%M.%S')}.log"
 )
 arg_parser.epilog = (
     "Example invocation: ./yacat.py --mask '?a?a?a' --hash '$P$5ZDzPE45CLLhEx/72qt3NehVzwN2Ry/'"
