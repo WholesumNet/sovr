@@ -5,9 +5,27 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 BASE_ADDRESS = 'http://localhost:9090/v1'
 
+def new_pod(_cookie: str,
+            _pod_name: str,
+            _password: str) -> None:
+  '''
+  Create a new pod in dfs
+  '''
+  response = requests.post(
+        f'{BASE_ADDRESS}/pod/new',
+        headers = headers,
+        json = {
+          'pod_name': _pod_name,
+          'password': _password
+        },
+      )
+  if response.status_code != 201: 
+    print(f'Failed to create the pod. status_code: `{response.status_code}`' \
+          f', message: `{response.json()["message"]}`')
+
 def open_pod(_cookie: str,
-         _pod_name: str,
-         _password: str) -> None:
+             _pod_name: str,
+             _password: str) -> None:
   '''
   Open a pod in dfs
   '''
@@ -56,8 +74,7 @@ def download_file(_cookie: str,
 def upload_file(_cookie: str,
                 _pod_name: str,
                 _pod_dir: str,
-                _local_filepath: str
-               ) -> dict :
+                _local_filepath: str) -> dict :
   '''
   Upload a file to dfs
   '''

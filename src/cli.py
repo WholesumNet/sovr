@@ -30,18 +30,11 @@ def persist_self(_cookie: str,
     ('Cookie', _cookie),
     ('content-type', 'application/json'),
   ])
-  response = requests.post(
-    f'{BASE_ADDRESS}/pod/new',
-    headers = headers,
-    json = {
-      'pod_name': pod_name,
-      'password': _password
-    },
-  )
-  if response.status_code != 201:
-    print(f'Pod creation failed, ignore this if pod is being updated.' \
-          f' status_code: `{response.status_code}`, message: `{response.json()["message"]}`')
-  helpers.open_pod(_cookie = _cookie, _pod_name = pod_name, _password = creds['password'])
+  
+  helpers.new_pod(_cookie = _cookie, _password = creds['password'],
+                  _pod_name = pod_name)
+  helpers.open_pod(_cookie = _cookie, _password = creds['password'],
+                   _pod_name = pod_name)
   # zip and upload 
   print('Uploading pod...')
   sovr_dir = pathlib.Path(__file__).parent.resolve()
@@ -85,18 +78,11 @@ def persist(_recipe: dict,
     ('Cookie', _cookie),
     ('content-type', 'application/json'),
   ])
-  response = requests.post(
-    f'{BASE_ADDRESS}/pod/new',
-    headers = headers,
-    json = {
-      'pod_name': pod_name,
-      'password': _password
-    },
-  )
-  if response.status_code != 201:
-    print(f'Pod creation failed, ignore this if pod is being updated.' \
-          f' status_code: `{response.status_code}`, message: `{response.json()["message"]}`')
-  helpers.open_pod(_cookie = _cookie, _pod_name = pod_name, _password = creds['password'])
+  
+  helpers.new_pod(_cookie = _cookie, _password = creds['password'],
+                  _pod_name = pod_name)
+  helpers.open_pod(_cookie = _cookie, _password = creds['password'],
+                   _pod_name = pod_name)
   # zip and upload 
   print('Uploading pods...')
   recipe_dir = pathlib.Path(_recipe_path).parent.resolve()
@@ -127,22 +113,12 @@ def persist(_recipe: dict,
     else:
       print(f'Failed to share the pod, status_code: {response.status_code}, message: {respons.json()["message"]}')  
   
-  # pod registry is a json file that holds a list of all pods persisted
-  # register it in the pod registry
+  # pod registry is a json file that holds a list of all persisted pods
   print('Registering pod...')
-  print('Attempting to create the pod registry, may fail if already created.')
-  response = requests.post(
-      f'{BASE_ADDRESS}/pod/new',
-      headers = headers,
-      json = {
-        'pod_name': PodRegistry,
-        'password': _password
-      },
-    )
-  if response.status_code != 201: 
-    print(f'Failed to create the pod registry. status_code: `{response.status_code}`' \
-          f', message: `{response.json()["message"]}`')
-  helpers.open_pod(_cookie = _cookie, _pod_name = PodRegistry, _password = creds['password'])
+  helpers.new_pod(_cookie = _cookie, _password = creds['password'],
+                   _pod_name = PodRegistry)
+  helpers.open_pod(_cookie = _cookie, _password = creds['password'],
+                   _pod_name = PodRegistry)
 
   # download registry, load it, update it, and save it back
   helpers.remove_file(f'./{PodRegistryFilePath}')  
@@ -204,6 +180,67 @@ def importPod(_cookie: str,
         f'now it can be run with\n' \
         f'`python cli.py --recipe {_pod_name}/{_pod_name}.recipe --run`')
 
+def generatePodRegistry(_cookie: str,
+                        _password: str) -> None:
+  '''
+  Generate pod registry by examinig all pods and adding those with a
+  `recipe.json` file at the `/` directory to the registry
+  '''
+  print('Generating pod registry...')
+  headers = CaseInsensitiveDict([
+    ('Cookie', _cookie),
+    ('content-type', 'application/json'),
+  ])
+  response = requests.get(
+      f'{BASE_ADDRESS}/pod/ls',
+      headers = headers,      
+    )
+  if response.status_code != 200: 
+    print(f'Failed to get the list of pods. status_code: `{response.status_code}`' \
+          f', message: `{response.json()["message"]}`')
+    return
+
+  pod_registry = {}
+  for pod_name in response.json()['pod_name']:
+    print(f'Examining `{pod_name}`...')
+    helpers.open_pod(_cookie = _cookie, _password = _password, _pod_name = pod_name)
+    out_recipe = f'./{pod_name}-recipe.json'
+    helpers.download_file(_cookie = _cookie, _pod_name = pod_name,
+                          _from = '/recipe.json',
+                          _to = out_recipe)
+    if not os.path.exists(out_recipe):
+      print(f'`{pod_name}` is not a compute pod.')
+      continue
+    # pass 1: just look for /recipe.json
+    recipe = None
+    with open(out_recipe, 'r') as f:
+      recipe = json.loads(f.read())
+    if not recipe:
+      print(f'`{pod_name}` appears to be a compute pod but the could not open read its recipe file.')
+      continue
+    # @ pass 2: open pod_name.zip and look into it
+    # add it to the pod registry
+    print(f'{pod_name} is a valid compute and will be added to the registry.')
+    pod_registry[pod_name] = recipe
+
+  print('Pod registry: ')
+  pp = pprint.PrettyPrinter()    
+  for r in pod_registry.values():
+    pp.pprint(r)
+  print(f'Total pods found: {len(pod_registry)}')
+  with open(f'./{PodRegistryFilePath}', 'w'):
+    f.write(json.dumps(pod_registry))
+  # upload the new pod registry to dfs
+  helpers.new_pod(_cookie = _cookie, _password = creds['password'],
+                   _pod_name = PodRegistry)
+  helpers.open_pod(_cookie = _cookie, _password = creds['password'],
+                   _pod_name = PodRegistry)
+  res = helpers.upload_file(_cookie = _cookie, _pod_name = PodRegistry,
+                            _pod_dir = '/', _local_filepath = f'./{PodRegistryFilePath}')
+  if res['status_code'] == 200:
+    print("Registry was saved successfully.")
+  else:
+    print(f'Could not save the registry. status_code: `{upload_status_code}`, message: `{res["message"]}`')
 
 def runPod(_recipe: dict) -> None:
   '''
@@ -263,6 +300,8 @@ def fork(_cookie: str,
   importPod(_cookie = _cookie, _password = _password,
             _pod_name = pod_info['pod_name'])
 
+
+
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Sovr command line interface')
   group = parser.add_mutually_exclusive_group()
@@ -270,6 +309,8 @@ if __name__ == '__main__':
                       help = 'specify a recipe file')
   parser.add_argument('--persist-self', action = 'store_true',
                       help = 'Persist the CLI itself and make it public. Caution: remove any credentials(password files, ...) before proceeding.')
+  parser.add_argument('--describe', action = 'store_true',
+                      help = 'More help on how to get started')
   group.add_argument('--persist', action = 'store_true',
                       help = 'Persist pod to dfs')
   group.add_argument('--fork',
@@ -280,6 +321,8 @@ if __name__ == '__main__':
                      help = 'Imports a pod to local filesystem, a pod name is expected')
   group.add_argument('--list-pods', action = 'store_true',
                      help = 'List all pods')  
+  group.add_argument('--generate-pod-registry', action = 'store_true',
+                     help = 'Generate a new pod registry by looking into all pods')
   args = parser.parse_args()
   
   creds = None  
@@ -300,6 +343,35 @@ if __name__ == '__main__':
     """)
     exit()
   
+
+  if args.describe:    
+    print(
+    """
+    Here\'s a few suggestions on how to use Sovr:    
+      - Use template pods available at the `./templates` directory by
+        `[--run|--persist] --recipe ./templates/blender/recipe.py`
+      - Share the compute pods at the `./templates` directory; remember to set
+        the `public` flag of the recipe file to `True` and then persist the pod.
+      - Help spread the word by persisting the CLI itself via the 
+        `--persist-self` option
+      - Go hardcore and create a compute pod for yourself with a recipe that
+        resembles the following schema:
+        {
+          "name": "blender",
+          "description": "Blender requestor pod that renders a .blend file.",
+          "version": "1.0",
+          "author": "john",
+          "public": true,
+          "golem": {
+            "exec": "python3 script/blender.py",
+            "script": "script",
+            "payload": "payload",
+            "output": "output",
+            "log": "logs"
+          }
+        }
+    """)
+
   # login
   cookie = auth.login(creds['username'], creds['password'])
   if not cookie:
@@ -331,36 +403,14 @@ if __name__ == '__main__':
 
   elif args.list_pods:
     pod_registry = pods(_cookie = cookie, _password = creds['password'])
-    pp = pprint.PrettyPrinter()
-    for (_, value) in pod_registry.items():
-      pp.pprint(value)
-      print('--------------------------------')
+    pp = pprint.PrettyPrinter()    
+    for recipe in pod_registry.values():
+      pp.pprint(recipe)
     print(f'Total pods: {len(pod_registry)}')
+
+  elif args.generate_pod_registry:
+    generatePodRegistry(_cookie = cookie, _password = creds['password'])
     
   else:
-    print(
-    """
-    Here\'s a more suggestions on how to use Sovr:    
-      - Use template pods available at the `./templates` directory.
-      - Share the compute pods at the `./templates` directory; remember to set
-        the `public` flag of the recipe file to `True` and persist the pod.
-      - Help spread the word by persisting the CLI itself via the 
-        `--persist-self` option
-      - Go hardcore and create a compute pod for yourself with a recipe that
-        resembles the following schema:
-        {
-          "name": "blender",
-          "description": "Blender requestor pod that renders a .blend file.",
-          "version": "1.0",
-          "author": "john",
-          "public": true,
-          "golem": {
-            "exec": "python3 script/blender.py",
-            "script": "script",
-            "payload": "payload",
-            "output": "output",
-            "log": "logs"
-          }
-        }
-    """)
+    print('Nothing to be done.')
   

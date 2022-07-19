@@ -1,7 +1,7 @@
 # Sovr
 ## Intro
-Sovr is an attempt to integrate the Golem network's compute prowess into the FairOS-dfs and the Swarm network. The whole idea revolves around the concept of compute pods.  With the help of Swarm and dfs the user is in charge of all the stuff required to run a DApp. This project is a small step towards the goal of a sophisticated sovereign exosystem where the incentives of a DApp beat those of centralized/cloud apps. An ocean to a man-made pond is what a dapp is to a capp.  
-A compute pod is a directory structure containing a `recipe` file, `script`, `payload`, `ouput`, and `log` folders. Here's a sample recipe file:  
+Sovr integrates the Golem network's compute prowess into the FairOS-DFS and the Swarm network. The whole idea revolves around the concept of compute pods. A compute pod is a set of files that provide the means to run a Golem task, save it to the  DFS, and share it with others. With the help of Swarm and  DFS, the user is in charge of all the stuff required to run a compute pod.    
+A compute pod is a directory structure containing a `recipe` file. This recipe determines how the pod is managed and what to expect from. Here's a sample recipe file:  
 <pre>
 {
   "name": "blender",
@@ -18,27 +18,36 @@ A compute pod is a directory structure containing a `recipe` file, `script`, `pa
   }
 }  
 </pre>
-The `name` property identifies the pod within the dfs. The `public` property is used to share the pod with others. The `golem` property directs how the inputs and outputs of a typical golem session are going to be interacted with. The `exec` property is used to invoke the golem tooling which will use the stuff from the `script` and `payload` properties. The `output` and `log` contain the outputs of a compute session.  
+The `name` property identifies the pod within the DFS. The `public` property indicates whether to share the pod with others. The `golem` property defines Golem specific stuff with `exec` being the executable command to run the pod, the `script` property defining the directory that contains the actual Golem script files, the `payload` property defining the directory that contains the input files, the `output` property defining the folder that gets the output of a Golem session run, and finally the `logs` property defining the folder where the logs are stored.  
+## Prerequisites
+The Sovr CLI requires Swarm, FairOS-DFS, and the Golem tooling:
+- To setup a Swarm node please consult https://docs.ethswarm.org/docs/  
+- To setup the FairOS-DFS, please consult https://docs.fairos.fairdatasociety.org/docs/fairOS-dfs/introduction  
+If you are not familiar with the Docker system, please use the binaries as they are rather easier to set up.  
+- To setup Golem, please consult https://handbook.golem.network/requestor-tutorials/flash-tutorial-of-requestor-development  
+Once the Swarm node(a light node is sufficient) and the FairOS-DFS server are up you can start working with CLI.  
+You would also need a valid account within the DFS environment. To create one, please open the DFS-CLI(usually found as `dfs-cli-amd64`, ...) and use the `user new` command. Remember to the credentials after you've created your user.
+
+## Where to get Sovr's CLI?
+Initially, Sovr is available here and you can just fork this repository and start.  
+
 ## How to run?
-You would need Swarm, FairOS-dfs and the Golem toolsets.  
-- Make sure you have the right credentials for the FairOS-dfs account. CLI expects a `creds.json` file in the same folder with the following structure.  
+- Make sure you have the right credentials for the FairOS-DFS account. CLI expects a `creds.json` file in the `src` with the following data:  
   <pre>
   {
     "username": "foo",
     "password": "bar"
   }
   </pre>  
-- Get Swarm node and dfs server up and running as outlined here https://docs.fairos.fairdatasociety.org/docs/  
-- Get Golem tools up and running from here https://handbook.golem.network/requestor-tutorials/flash-tutorial-of-requestor-development
-- Get a virtual environment and install necessary libraries. You'd need typical ones like `yapapi`, `requests`, ...
-- Make sure the `foo/logs` folder exists and then invoke `python3 cli.py --recipe foo/recipe.json --run`
-- Once Golem is done, observe the contents of the `foo/log` and `foo/output`. Now you can save your compute pod on the dfs with `python3 cli.py --recipe foo/recipe.json --persist`, 
-note that if your recipe file has set the `public` property to `true`, then you'd get a `sharing reference key` that you can pass to the `--fork` command or your friends.  
+- Get a virtual environment and install necessary libraries. You'd need typical ones like `yapapi`, `requests`, `requests-toolbelt`...  
+- To get you started, we have prepared some templates in the `src/templates` folder that you can use right away. For example, to run the Blender task on Golem, get Golem's Yagna server up, initialize it(all documented with the Golem docs shared aboved), and invoke `python3 src/cli.py --recipe src/templates/blender/recipe.json --run`  
+- Once Golem task is finished, observe the contents of the `src/templates/blender/logs` and `src/templates/blender/output`. Now that you have run your task on Golem, it's time to save it on DFS. To save your compute pod, invoke `python3 src/cli.py --recipe foo/recipe.json --persist`.  Under the hood, Swarm and DFS sort things out and save your stuff. Please note that if your recipe file has set the `public` property to `true`, your pod gets shared publicly and you receive a `sharing reference key`.  
+- Once persisted, a compute pod resides within DFS until it gets garbage collected. Meanwhile, you can share your `sharing reference key` with anyone who can in turn spin up the CLI and fork your compute pod using the `--fork` option.  
+Note that the Swarm and DFS nodes should be configured to point to the `goerli` endpoints.
 
-
-Another way to start is to fork a template Blender project already shared by us. Invoke `python3 cli.py --fork 2f06c9e6e1a682351104b44f0b6f44714c3d1657ca4e4f03876fbb851913cd76` and wait for it to be pulled into your dfs account and then unpacked inside your current working directory.  
-Note that the network should be configured to point to `goerli` endpoints.
-
-## Demo
-https://www.youtube.com/watch?v=zRPUyUw-5Ek
-
+## Features
+The CLI's `--help` and `--describe` provide enough resources for you to begin, but here we list some feaures of the CLI that might be of interest to you:
+- `--persist-self` takes a copy of the `src` folder and saves it to the DFS as a public shared pod.
+- `--list-pods` shows a list of all registered compute pods.
+- `--import-pod` downloads a pod from DFS and puts it in the local filysystem. This is the opposite of the `--persist` option.
+- `--generate-pod-registry` creates a pod registry where all compute pods of the user are managed. Each compute pod contains a .zip file and a `recipe.json` file at the `/` of the pod. This option performs a soft look up of all pods and adds them to the registry. A pod registry is necessary since each user could have tens of other pods and this way we make sure we have a soft-way of knowing what's being stored.
