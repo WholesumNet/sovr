@@ -13,7 +13,9 @@ def new_pod(_cookie: str,
   '''
   response = requests.post(
         f'{BASE_ADDRESS}/pod/new',
-        headers = headers,
+        headers = CaseInsensitiveDict([
+          ('Cookie', _cookie),
+        ]),
         json = {
           'pod_name': _pod_name,
           'password': _password
@@ -42,13 +44,12 @@ def open_pod(_cookie: str,
   if response.status_code != 200:    
     print(f'Pod could not be openned. status_code: `{response.status_code}, message: `{response.json()["message"]}`')
 
-def download_file(_cookie: str,
-                  _pod_name: str,
-                  _from: str,
-                  _to: str) -> None:
+def download_content(_cookie: str,
+                     _pod_name: str,
+                     _from: str) -> bytes:
   '''
-  Download a file from dfs
-  ''' 
+  Download some content from dfs
+  '''
   print(f'Downloading `{_from}`...')
   mp_encoder = MultipartEncoder(
     fields = {
@@ -64,11 +65,26 @@ def download_file(_cookie: str,
       'Cookie': _cookie
     }    
   )
-  if response.status_code != 200:   
+  content = None
+  if response.status_code == 200:
+    content = response.content
+  else:
     print(f'Download failed, status_code: {response.status_code}, message: {response.json()["message"]}')
+  return content  
+
+def download_file(_cookie: str,
+                  _pod_name: str,
+                  _from: str,
+                  _to: str) -> None:
+  '''
+  Download a file from dfs
+  ''' 
+  content = download_content(_cookie = _cookie, _pod_name = _pod_name,
+                             _from = _from)
+  if not content:
     return
   with open(_to, 'wb') as f:
-      f.write(response.content)  
+      f.write(content)  
   print(f'Download succeeded and saved to `{_to}`.')
 
 def upload_file(_cookie: str,

@@ -22,15 +22,14 @@ A compute pod is a directory structure containing a `recipe` file. This recipe d
 - The `golem` property defines Golem specific stuff with the `exec` preperty being the executable command to run the pod, the `script` property defining the directory that contains the actual Golem script files, the `payload` property defining the directory that contains the input files, the `output` property defining the folder that gets the output of a Golem session run, and finally the `logs` property defining the folder where the logs are stored.  
 ## Prerequisites
 The Sovr CLI requires Swarm, FairOS-DFS, and the Golem tooling:
-- To setup a Swarm node please consult https://docs.ethswarm.org/docs/  
+- To setup the Swarm node please consult https://docs.ethswarm.org/docs/  
 - To setup the FairOS-DFS, please consult https://docs.fairos.fairdatasociety.org/docs/fairOS-dfs/introduction  
 If you are not familiar with the Docker system, please use the binaries as they are rather easier to set up.  
 - To setup Golem, please consult https://handbook.golem.network/requestor-tutorials/flash-tutorial-of-requestor-development  
 
-Once the Swarm node(a light node is sufficient) and the FairOS-DFS server are up you can start working with CLI.  
-You would also need a valid account within the DFS environment. To create one, please open the DFS-CLI(usually found as `dfs-cli-amd64`, ...) and use the `user new` command. Remember to the credentials after you've created your user.  
+Once the Swarm node(a light node is sufficient) and the FairOS-DFS server are up, you can start working with Sovr CLI.  
+You would also need a valid account within the DFS environment. To create one, please open the DFS-CLI(usually found as `dfs-cli-amd64`, ...) and use the `user new` command. Remember to save the credentials after you've created your user.  
 Note that the Swarm and DFS nodes should be configured to point to the `goerli` endpoints.
-
 
 ## Where to get Sovr's CLI?
 Initially, Sovr is available here and you can just fork this repository and start.  
