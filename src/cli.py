@@ -62,9 +62,6 @@ def persist_self(_cookie: str,
   else:
     print(f'Failed to share the pod, status_code: {response.status_code}, message: {respons.json()["message"]}')  
 
-  
-
-
 def persist(_recipe: dict,
             _recipe_path: str,
             _cookie: str,
@@ -119,7 +116,7 @@ def persist(_recipe: dict,
       # keep track of the shared pods
       print('Keeping track of the shared pod...')
       helpers.new_pod(_cookie = _cookie, _password = creds['password'],
-                       _pod_name = SharedPodsPod)
+                      _pod_name = SharedPodsPod)
       helpers.open_pod(_cookie = _cookie, _password = creds['password'],
                        _pod_name = SharedPodsPod)
       # download shared pods list, update it, and save it back
@@ -163,6 +160,43 @@ def persist(_recipe: dict,
   else:
     print(f'Registration failed. status_code: `{upload_status_code}`, message: `{res["message"]}`')
   helpers.remove_file(f'./{PodRegistryFilePath}')  
+  # share output
+  output = recipe['golem']['output']
+  if type(output) == dict:
+    '''
+    Share a subdir of the output as a public pod
+    .
+    .
+    .
+    "golem": {
+      "exec": "python3 script/blender.py",
+      "script": "script",
+      "payload": {
+        "pod": "ej38x1...1a20fd",
+        "files": ["/aloha/mahalo.blend"]
+      },
+      "output": {
+        "share": "output/actuals"
+      },
+      "log": "logs"
+    }
+    .
+    .
+    .
+    '''
+    output_pod_name = 'output-' + pod_name
+    helpers.remove_file(f'./{output_pod_name}.zip')
+    output_share_dir = pathlib.Path(f'{_recipe_path}/{output["share"]}').resolve()
+    shutil.make_archive(f'{output_pod_name}', 'zip', f'{output_share_dir}')
+    helpers.new_pod(_cookie = _cookie, _password = creds['password'],
+                    _pod_name = output_pod_name)
+    helpers.open_pod(_cookie = _cookie, _password = creds['password'],
+                     _pod_name = output_pod_name)    
+    res = helpers.upload_file(_cookie = _cookie, _pod_name = output_pod_name,
+                              _pod_dir = '/', _local_filepath = f'./{output_pod_name}.zip')
+    if res['status_code'] != 200:
+      print(f'Failed to share the output, status_code: {res["status_code"]}, message: {res["message"]}')    
+
 
 def pods(_cookie: str,
         _password: str) -> dict:
@@ -184,26 +218,67 @@ def pods(_cookie: str,
       pod_registry[key]['sharing_references'] = [p['sharing_reference'] for p in value]
   return pod_registry
 
+def importPayload(_cookie: str,
+                  _password: str,
+                  _where: str,
+                  _reference: dict) -> bool:
+  ''' 
+  Fork and import the payload
+  '''
+  '''
+   .
+   .
+   .
+   "golem": {
+    "exec": "python3 script/blender.py",
+    "script": "script",
+    "payload": {
+      "ref": "ej38b1...1a20fd",
+    },
+    .
+    .
+    .
+  '''
+  print(f'Importing payload `{_reference}`...')
+  pod_info = fork(_cookie = _cookie, _password = _password,
+                  _reference = _reference, _where = _where, _should_import = False)
+  if not pod_info:
+    print('Failed to import the payload.')
+    return False
+  pod_name = pod_info['pod_name']
+  helpers.open_pod(_cookie = _cookie, _pod_name = pod_name,
+                   _password = _password)
+  helpers.download_file(_cookie = _cookie,
+                        _pod_name = pod_name,
+                        _from = f'/payload.zip',
+                        _to = f'{_where}/external-payload.zip')
+  # add the external payload to the payload/external directory
+  shutil.unpack_archive(f'{_where}/external-payload.zip',
+                        f'{_where}/payload/external')
+  helpers.remove_file(f'{_where}/external-payload.zip')
+  return True
+
 def importPod(_cookie: str,
               _password: str,
-              _pod_name: str) -> None:
+              _pod_name: str,
+              _where: str = '.') -> None:
   '''
-  download a pod into local filesystem
+  download a pod into the local filesystem
   '''
   print(f'Importing pod `{_pod_name}`...')
-  helpers.remove_file(f'./{_pod_name}.zip')
+  helpers.remove_file(f'{_where}/{_pod_name}.zip')
   helpers.open_pod(_cookie = _cookie, _pod_name = _pod_name, _password = _password)
   helpers.download_file(_cookie = _cookie, _pod_name = _pod_name,
                         _from = f'/{_pod_name}.zip',
-                        _to = f'./{_pod_name}.zip')
-  if not os.path.exists(f'./{_pod_name}.zip'):
+                        _to = f'{_where}/{_pod_name}.zip')
+  if not os.path.exists(f'{_where}/{_pod_name}.zip'):
     print('Import failed.')
     return  
-  shutil.unpack_archive(f'{_pod_name}.zip', f'./{_pod_name}', 'zip')
-  helpers.remove_file(f'./{_pod_name}.zip')
-  print(f'Pod is ready at ./`{_pod_name}` directory, ' \
+  shutil.unpack_archive(f'{_where}/{_pod_name}.zip', f'{_where}/{_pod_name}')
+  helpers.remove_file(f'{_where}/{_pod_name}.zip')  
+  print(f'Pod is ready at `{_where}/{_pod_name}` directory, ' \
         f'now it can be run with\n' \
-        f'`python cli.py --recipe {_pod_name}/{_pod_name}.recipe --run`')
+        f'`python cli.py --recipe {_where}/{_pod_name}/{_pod_name}.recipe --run`')
 
 def generatePodRegistry(_cookie: str,
                         _password: str) -> None:
@@ -261,16 +336,29 @@ def generatePodRegistry(_cookie: str,
     print(f'Could not save the registry. status_code: `{upload_status_code}`, message: `{res["message"]}`')
   helpers.remove_file(f'./{PodRegistryFilePath}')
 
-def runPod(_recipe: dict) -> None:
+def runPod(_cookie: str,
+           _password: str, 
+           _recipe: dict, 
+           _base_path: str = '.') -> None:
   '''
   Runs a compute pod on Golem
   '''
   if not _recipe: 
+    print('Invalid recipe.')
     return
+  print(f'base path: `{_base_path}`')
   golem = _recipe['golem']
+  # fork and import payload if it is an external dependency
+  payload = golem['payload']
+  if type(payload) == dict:
+    if not importPayload(_cookie = _cookie, _password = _password,
+                         _where = _base_path, _reference = payload['ref']):
+      print('Failed to import the external payload.')
+      return
+
   command = f'{golem["exec"]}'.split(' ')
-  command[-1] = f'{_recipe["name"]}/{command[-1]}'
-  print(f'Running pod {command}...')
+  command[-1] = f'{_base_path}/{command[-1]}'
+  print(f'Running pod `{" ".join(command)}`...')
   proc = subprocess.Popen(command)  
   proc.wait()
   print(f'Exit code: {proc.returncode}')
@@ -278,7 +366,9 @@ def runPod(_recipe: dict) -> None:
 
 def fork(_cookie: str,
          _password: str,
-         _reference: str) -> None:
+         _reference: str,
+         _where: str = '.',
+         _should_import: bool = True) -> None:
   '''
   Fork a public pod
   '''
@@ -299,7 +389,7 @@ def fork(_cookie: str,
     print(f'Got some info about the pod: {pod_info}')
   else:
     print(f'Failed to get any info about the pod. status_code: {response.status_code}, message: {response.json()["message"]}')
-    return
+    return None
 
   response = requests.get(
     f'{BASE_ADDRESS}/pod/receive',
@@ -313,14 +403,54 @@ def fork(_cookie: str,
   if response.status_code == 200:
     print(f'Pod forked successfully.')
   else:    
-    print(f'Failed to fork pod, status_code: `{response.status_code}`, message: `{response.json()["message"]}`')
-    return
+    print(f'Failed to fork the pod, status_code: `{response.status_code}`, message: `{response.json()["message"]}`')
 
-  importPod(_cookie = _cookie, _password = _password,
-            _pod_name = pod_info['pod_name'])
+  if _should_import:
+    importPod(_cookie = _cookie, _password = _password,
+              _pod_name = pod_info['pod_name'], _where = _where)
+  return pod_info
 
+def runTask(_cookie: str,
+            _password: str,
+            _task: dict,
+            _base_path: str = '.') -> None:
+  '''
+  Given a task description file with the following structure, run compute pods
+  one by one.
+  {
+    "name": "ML pipeline",
+    "pods": ["0xAA...AA", "0xBB...BB", ..., "0xZZ...ZZ"]
+  }
+  '''
+  task_name = _task['name']
+  print(f'Running task `{task_name}`...')
+  prev_output = None
+  for pod_ref in _task['pods']:    
+    # fork
+    pod_info = fork(_cookie = _cookie, _password = _password,
+                    _reference = pod_ref, _where = _base_path)
+    if not pod_info:
+      print('Failed to finish task completely, forking was problematic.')
+      return
+    pod_name = pod_info['pod_name']
+    recipe = None
+    recipe_path = f'{_base_path}/{pod_name}/recipe.json'
+    with open(recipe_path, 'r') as f:
+      recipe = json.loads(f.read())
+    if not recipe:
+      print('Failed to finish task completely, recipe file '
+            '`{recipe_path}` appears to be invalid.')
+      return 
+    # copy the output of the previous pod into the curren pod
+    if prev_output is not None:
+      # @ copytree on py3.8 ignores errors on existing files via `dirs_exist_ok = True`
+      shutil.copytree(src = prev_output, dst = f'{_base_path}/{pod_name}/payload/external')
+    runPod(_cookie = _cookie, _password = _password,
+           _recipe = recipe, _base_path = f'{_base_path}/{pod_name}')
+    prev_output = f'{_base_path}/{pod_name}/output'
+  print('Task finished successfully!')      
 
-
+# <-- Entry point: Main -->
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Sovr command line interface')
   group = parser.add_mutually_exclusive_group()
@@ -342,6 +472,8 @@ if __name__ == '__main__':
                      help = 'List all pods')  
   group.add_argument('--generate-pod-registry', action = 'store_true',
                      help = 'Generate a new pod registry by looking into all pods')
+  group.add_argument('--task',
+                     help = 'Fork, import, and finally run all compute pods requested in a task description file, a task description file is expected.')
   args = parser.parse_args()
   
   creds = None  
@@ -389,6 +521,18 @@ if __name__ == '__main__':
             "log": "logs"
           }
         }
+      - Go diehard and create a task. A task is typically composed of several public compute
+        pods that are linked together(Output of podN feeds in as the payload for podN+1). 
+        A task is described in a json file with the following simple structure.
+        `ML-Pipeline.json`:
+        {
+          "name": "ML pipeline",
+          "pods": ["0xAA...AA", "0xBB...BB", ..., "0xZZ...ZZ"]
+        }
+        Once your json file is ready, run the CLI with `--task ML-Pipeline.json` and watch
+        how compute pods join together to complete your complex task. When completed, the 
+        output of all pods are in their respective directories with the output of the
+        last one being the result of the task.
     """)
 
   # login
@@ -414,7 +558,9 @@ if __name__ == '__main__':
     fork(args.fork, cookie, creds['password'])
 
   elif args.run:
-    runPod(recipe)
+    recipe_path = f'{pathlib.Path(args.recipe).parent.resolve()}'
+    runPod(_cookie = cookie, _password = creds['password'],
+           _recipe = recipe, _base_path = recipe_path)
 
   elif args.import_pod:
     importPod(_cookie = cookie, _password = creds['password'],
@@ -428,11 +574,21 @@ if __name__ == '__main__':
     print(f'Total pods: {len(pod_registry)}')
     if len(pod_registry) == 0:
       print('No pods were found in the registry. If you think the pod registry is' \
-          ' corrupted, please consult the --fix-registry option in the help.')
+            ' corrupted, please consult the --fix-registry option in the help.')
 
   elif args.generate_pod_registry:
     generatePodRegistry(_cookie = cookie, _password = creds['password'])
     
+  elif args.task:
+    task_path = f'{pathlib.Path(args.task).parent.resolve()}'
+    task = None
+    with open(args.task, "r") as f:
+      task = json.loads(f.read())
+    if task:
+      runTask(_cookie = cookie, _password = creds['password'],
+              _task = task, _base_path = task_path)
+    else:
+      print('Could not start the task, please make sure the task description file is fine.')
   else:
     print('Nothing to be done.')
   
