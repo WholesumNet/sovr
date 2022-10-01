@@ -1,6 +1,6 @@
 # Sovr
 ## Introduction
-Sovr integrates the Golem network's compute prowess into the FairOS-DFS and the Swarm network's storage facilities. The whole idea revolves around the concept of compute pods. A compute pod is simply a dset of files that defines how a Golem task should run, what are the inputs, outputs, and finally where the logs are going to be held. All these files are finally stored in decentralized storage of the DFS and Swarm. The tool that is in charge of persisting, sharing, and running compute pods is the Sovr CLI.  
+Sovr integrates the Golem network's compute prowess into the FairOS-DFS and the Swarm network's storage facilities. The whole idea revolves around the concept of compute pods. A compute pod is simply a set of files that define how a Golem task should run, what are the inputs, outputs, and finally where the logs are going to be held. All these files are finally stored in decentralized storage of the DFS and Swarm. The tool that is in charge of persisting, sharing, and running compute pods is the Sovr CLI.  
 A compute pod is a directory structure containing a `recipe` file. This recipe described in a JSON file and determines the various properties of a compute pod. Here's a sample recipe file:  
 <pre>
 "recipe.json":
@@ -78,7 +78,7 @@ Once the Swarm node(a light node is sufficient) and the FairOS-DFS server are up
 You would also need a valid account within the DFS environment. To create one, please open the DFS-CLI(usually found as `dfs-cli-amd64`, ...) and use the `user new` command. Remember to save the credentials after you've created your user.  
 Note that the Swarm and DFS nodes should be configured to point to the `goerli` endpoints.
 
-## Where to get Sovr's CLI?
+## Where to get Sovr CLI?
 Initially, Sovr is available here and you can just fork this repository and start.  
 
 ## How to run?
@@ -90,8 +90,8 @@ Initially, Sovr is available here and you can just fork this repository and star
   }
   </pre>  
 - Get a virtual environment and install necessary libraries. You'd need typical ones like `yapapi`, `requests`, `requests-toolbelt`...  
-- To get you started, we have prepared some templates in the `src/templates` folder that you can use right away. For example, to run the Blender task on Golem, get Golem's Yagna server up, initialize it(all documented with the Golem docs shared aboved), and invoke `python3 src/cli.py --recipe src/templates/blender/recipe.json --run`  
-- Once Golem task is finished, observe the contents of the `src/templates/blender/logs` and `src/templates/blender/output`. Now that you have run your task on Golem, it's time to save it on DFS. To save your compute pod, invoke `python3 src/cli.py --recipe src/templates/blender/recipe.json --persist`.  Under the hood, Swarm and DFS sort things out and save your stuff. Please note that if your recipe file has set the `public` property to `true`, your pod gets shared publicly and you receive a `reference key`.  
+- To get you started, we have prepared some templates in the `src/pods/templates` and `src/templates/tasks` directories that you can use right away. For example, to run the Blender task on Golem, get Golem's Yagna server up, initialize it(all documented with the Golem docs shared aboved), and invoke `python3 src/cli.py --recipe src/templates/pods/blender/recipe.json --run`  
+- Once Golem task is finished, observe the contents of the `src/templates/pods/blender/logs` and `src/templates/pods/blender/output`. Now that you have run your task on Golem, it's time to save it on DFS. To save your compute pod, invoke `python3 src/cli.py --recipe src/templates/pods/blender/recipe.json --persist`.  Under the hood, Swarm and DFS sort things out and save your stuff. Please note that if your recipe file has set the `public` property to `true`, your pod gets shared publicly and you receive a `reference key`.  
 - Once persisted, a compute pod resides within DFS until it gets garbage collected. Meanwhile, you can share your `reference key` with anyone who can in turn spin up the CLI and fork your compute pod using the `--fork` option.  
 
 ## CLI 
