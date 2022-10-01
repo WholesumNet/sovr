@@ -52,7 +52,7 @@ Once the compute is going to be ran, the payload is fetched and put into the `pa
 The `output/results` directory is then shared(when persisting) as a standalone pod ready to be used by other compute pods. One of the consequences of compute pods' communication, is the emergence of more interesting ways of computing. This brings us to the notion of tasks.  
 ## Tasks
 A task is a sequence of compute pods with podN's output feeding into podN+1's payload, enabling more complex models of computation. The following figure demonstrates a typical task consisting of 4 indicidual compute pods:  
-< p align="center">
+<p align="center">
 ![A typical task](https://raw.githubusercontent.com/LickliderCircle/sovr/main/docs/assets/task.png)  
 </p>
 Here each compute pod could receive the payload from previous compute pod's `output`, any public pod, and the stuff already in its `payload` directory. A task is described in a task description JSON file with the following structure:  
