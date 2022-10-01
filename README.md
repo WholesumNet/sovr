@@ -66,7 +66,8 @@ Here each compute pod could receive the payload from previous compute pod's `out
   ]
 }
 </pre>  
-Here the `pods` property expects an array of public compute pods' references. To start a task simply invoke the CLI with `--task some-seq.json`. Each compute pod of the task is then fetched and run sequentially until the output of the whole taks is ready in the `output` directory of the last pod.    
+Here the `pods` property expects an array of public compute pods' references. To start a task simply invoke the CLI with `--task some-seq.json`. Each compute pod of the task is then fetched and run sequentially until the output of the whole taks is ready in the `output` directory of the last pod.  
+
 ## Prerequisites
 The Sovr CLI requires Swarm, FairOS-DFS, and the Golem tooling:
 - To setup the Swarm node please consult https://docs.ethswarm.org/docs/  
