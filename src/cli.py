@@ -458,8 +458,6 @@ if __name__ == '__main__':
                       help = 'specify a recipe file')
   parser.add_argument('--persist-self', action = 'store_true',
                       help = 'Persist the CLI itself and make it public. Caution: remove any credentials(password files, ...) before proceeding.')
-  parser.add_argument('--describe', action = 'store_true',
-                      help = 'More help on how to get started')
   group.add_argument('--persist', action = 'store_true',
                       help = 'Persist pod to dfs')
   group.add_argument('--fork',
@@ -493,47 +491,6 @@ if __name__ == '__main__':
       Where "username" and "password" are valid within the FairOS-DFS.      
     """)
     exit()
-  
-
-  if args.describe:    
-    print(
-    """
-    Here\'s a few suggestions on how to use Sovr:    
-      - Use template pods available at the `./templates` directory by
-        `[--run|--persist] --recipe ./templates/blender/recipe.py`
-      - Share the compute pods at the `./templates` directory; remember to set
-        the `public` flag of the recipe file to `True` and then persist the pod.
-      - Help spread the word by persisting the CLI itself via the 
-        `--persist-self` option
-      - Go hardcore and create a compute pod for yourself with a recipe that
-        resembles the following schema:
-        {
-          "name": "blender",
-          "description": "Blender requestor pod that renders a .blend file.",
-          "version": "1.0",
-          "author": "john",
-          "public": true,
-          "golem": {
-            "exec": "python3 script/blender.py",
-            "script": "script",
-            "payload": "payload",
-            "output": "output",
-            "log": "logs"
-          }
-        }
-      - Go diehard and create a task. A task is typically composed of several public compute
-        pods that are linked together(Output of podN feeds in as the payload for podN+1). 
-        A task is described in a json file with the following simple structure.
-        `ML-Pipeline.json`:
-        {
-          "name": "ML pipeline",
-          "pods": ["0xAA...AA", "0xBB...BB", ..., "0xZZ...ZZ"]
-        }
-        Once your json file is ready, run the CLI with `--task ML-Pipeline.json` and watch
-        how compute pods join together to complete your complex task. When completed, the 
-        output of all pods are in their respective directories with the output of the
-        last one being the result of the task.
-    """)
 
   # login
   cookie = auth.login(creds['username'], creds['password'])
