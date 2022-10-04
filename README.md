@@ -28,14 +28,20 @@ A compute pod is a directory structure containing a `recipe` file. This recipe d
     .
     .
     "payload": {
-      "ref": "ej38b1...1a20fd",      
+      "refs": [
+        "ej38b1...",
+        "1a20fd...",
+        .
+        .
+        .
+      ],
     },
     .
     .
     .
   },  
 </pre>
-Once the compute is going to be ran, the payload is fetched and put into the `payload/external` directory and ready to be used. To add symmetry to this scheme, the output of a compute pod can also be shared when persisting a pod. To enable this, change the `output` property to look as follows:
+Once the compute is going to be ran, the payload is fetched and put into the `payload/external` directory and ready to be used. Note that a compute pod can use several external public pods as payload, hence the `refs` array. To add symmetry to this scheme, the output of a compute pod can also be shared when persisting a pod. To enable this, change the `output` property to look as follows:
 <pre>
   "golem": {
     .

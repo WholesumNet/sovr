@@ -218,14 +218,13 @@ def pods(_cookie: str,
       pod_registry[key]['sharing_references'] = [p['sharing_reference'] for p in value]
   return pod_registry
 
-def importPayload(_cookie: str,
-                  _password: str,
-                  _where: str,
-                  _reference: dict) -> bool:
+def importExternalPayload(_cookie: str,
+                          _password: str,
+                          _where: str,
+                          _payload: dict) -> dict:
   ''' 
   Fork and import the payload
-  '''
-  '''
+  A typical recipe with external payload:
    .
    .
    .
@@ -233,30 +232,36 @@ def importPayload(_cookie: str,
     "exec": "python3 script/blender.py",
     "script": "script",
     "payload": {
-      "ref": "ej38b1...1a20fd",
+      "refs": [
+        "ej38b1...", "1a20fd...", ...
+      ],
     },
     .
     .
     .
   '''
-  print(f'Importing payload `{_reference}`...')
-  pod_info = fork(_cookie = _cookie, _password = _password,
-                  _reference = _reference, _where = _where, _should_import = False)
-  if not pod_info:
-    print('Failed to import the payload.')
-    return False
-  pod_name = pod_info['pod_name']
-  helpers.open_pod(_cookie = _cookie, _pod_name = pod_name,
-                   _password = _password)
-  helpers.download_file(_cookie = _cookie,
-                        _pod_name = pod_name,
-                        _from = f'/payload.zip',
-                        _to = f'{_where}/external-payload.zip')
-  # add the external payload to the payload/external directory
-  shutil.unpack_archive(f'{_where}/external-payload.zip',
-                        f'{_where}/payload/external')
-  helpers.remove_file(f'{_where}/external-payload.zip')
-  return True
+  if type(_payload) is not dict:
+    return 
+  shutil.rmtree(path = f'{_where}/payload/external', ignore_errors = True)  
+  for ref in _payload['refs']:
+    print(f'Importing External payload `{ref}`...')
+    pod_info = fork(_cookie = _cookie, _password = _password,
+                    _reference = ref, _where = _where, _should_import = False)
+    if not pod_info:
+      print('Failed to import the payload.')
+      continue
+    pod_name = pod_info['pod_name']
+    helpers.open_pod(_cookie = _cookie, _pod_name = pod_name,
+                     _password = _password)    
+    external_path = f'{_where}/payload/external/{ref}'
+    external_zip = f'{external_path}.zip'    
+    helpers.download_file(_cookie = _cookie, _pod_name = pod_name,
+                          _from = f'/payload.zip',
+                          _to = external_zip)
+    # add the external payload to the payload/external/ref directory
+    shutil.unpack_archive(external_zip,
+                          external_path)
+    helpers.remove_file(external_zip)
 
 def importPod(_cookie: str,
               _password: str,
@@ -349,12 +354,8 @@ def runPod(_cookie: str,
   print(f'base path: `{_base_path}`')
   golem = _recipe['golem']
   # fork and import payload if it is an external dependency
-  payload = golem['payload']
-  if type(payload) == dict:
-    if not importPayload(_cookie = _cookie, _password = _password,
-                         _where = _base_path, _reference = payload['ref']):
-      print('Failed to import the external payload.')
-      return
+  importExternalPayload(_cookie = _cookie, _password = _password,
+                        _where = _base_path, _payload = golem['payload'])
 
   command = f'{golem["exec"]}'.split(' ')
   command[-1] = f'{_base_path}/{command[-1]}'
@@ -424,6 +425,11 @@ def runTask(_cookie: str,
   '''
   task_name = _task['name']
   print(f'Running task `{task_name}`...')
+  try:
+    os.mkdir(f'{_base_path}/{task_name}')
+  except:
+    pass
+
   prev_output = None
   for pod_ref in _task['pods']:    
     # fork
@@ -443,12 +449,13 @@ def runTask(_cookie: str,
       return 
     # copy the output of the previous pod into the curren pod
     if prev_output is not None:
-      # @ copytree on py3.8 ignores errors on existing files via `dirs_exist_ok = True`
+      shutil.rmtree(path = f'{_base_path}/{pod_name}/payload/external', 
+                    ignore_errors = True)
       shutil.copytree(src = prev_output, dst = f'{_base_path}/{pod_name}/payload/external')
     runPod(_cookie = _cookie, _password = _password,
            _recipe = recipe, _base_path = f'{_base_path}/{pod_name}')
     prev_output = f'{_base_path}/{pod_name}/output'
-  print('Task finished successfully!')      
+  print('Task finished and the output is available at `{prev_output}`')      
 
 # <-- Entry point: Main -->
 if __name__ == '__main__':
