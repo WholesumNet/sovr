@@ -27,10 +27,15 @@ A compute pod is a directory structure containing a `recipe` file. This recipe d
     .
     .
     .
-    "payload": {
-      "refs": [
-        "ej38b1...",
-        "1a20fd...",
+    "payload": [
+        {
+          "ref": "ej38b1...",
+          "data": "/data.zip"
+        },
+        {
+          "ref": "1a20fd...",
+          "data": "/jake/lime.zip"
+        },
         .
         .
         .
