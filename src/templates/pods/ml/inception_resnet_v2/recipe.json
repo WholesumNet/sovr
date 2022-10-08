@@ -1,0 +1,19 @@
+{
+  "name": "InceptionResNetV2",
+  "description": "An InceptionResNetV2 model for image classification based on Keras applications",
+  "version": "1.0",
+  "author": "reza",
+  "public": true,
+  "golem": {
+    "exec": "python3 [@]script/script.py --model inception_resnet_v2 --images [@]payload/external/images",
+    "script": "script",
+    "payload": [
+      {
+        "ref": "da41f8dfd57e2e89df2dacd3b01c4a1dbc7c4a1df429f96743317e6a220c5fac",
+        "data": "/images.zip"
+      }
+    ],
+    "output": "output",
+    "log": "logs"
+  }
+}

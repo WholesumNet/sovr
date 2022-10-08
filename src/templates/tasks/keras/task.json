@@ -1,0 +1,11 @@
+{
+  "name": "keras",
+  "description": "Keras applications as compute pods, each pod is a model",
+  "pods": [
+    "de54ac9d712250b80edfac9cc70bf02e21dce4feae73e8ac521024de4e0a988b",
+    "a61d11e7335ed41e56494ae4bee5446f7785737938a35454e3190c5ccae283ea",
+    "c421132259fbe7af4299f9d0d18338dbfa17b0ecb6cf66430703e93491d82307",
+    "f75d38dc14e5d1e194b06db781524bd403f3a1dbf44c7d77bf3efdce5572d26d",
+    "e5ec8eae6391abdd497869f4a6c1c275f956d6450a570fa6eb24f9eb7c5126d6"
+  ]
+}

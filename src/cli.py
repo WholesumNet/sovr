@@ -221,7 +221,7 @@ def pods(_cookie: str,
 def importExternalPayload(_cookie: str,
                           _password: str,
                           _where: str,
-                          _payload: dict) -> dict:
+                          _payload: list) -> dict:
   ''' 
   Fork and import the payload
   A typical recipe with external payload:
@@ -231,19 +231,34 @@ def importExternalPayload(_cookie: str,
    "golem": {
     "exec": "python3 script/blender.py",
     "script": "script",
-    "payload": {
-      "refs": [
-        "ej38b1...", "1a20fd...", ...
+    "payload": [
+        {
+          "ref": "ej38b1...",
+          "data": "/data.zip"
+        },
+        {
+          "ref": "1a20fd...",
+          "data": "/jake/lime.zip"
+        },
+        .
+        .
+        .
       ],
     },
     .
     .
     .
   '''
-  if type(_payload) is not dict:
+  if type(_payload) is not list:
     return 
   shutil.rmtree(path = f'{_where}/payload/external', ignore_errors = True)  
-  for ref in _payload['refs']:
+  try:
+    os.mkdir(f'{_where}/payload/external')
+  except:
+    pass
+  for p in _payload:
+    ref = p['ref']
+    ext_data = p['data']
     print(f'Importing External payload `{ref}`...')
     pod_info = fork(_cookie = _cookie, _password = _password,
                     _reference = ref, _where = _where, _should_import = False)
@@ -253,10 +268,10 @@ def importExternalPayload(_cookie: str,
     pod_name = pod_info['pod_name']
     helpers.open_pod(_cookie = _cookie, _pod_name = pod_name,
                      _password = _password)    
-    external_path = f'{_where}/payload/external/{ref}'
-    external_zip = f'{external_path}.zip'    
+    external_path = f'{_where}/payload/external/'
+    external_zip = f'{_where}/payload/external/{ref}.zip'    
     helpers.download_file(_cookie = _cookie, _pod_name = pod_name,
-                          _from = f'/payload.zip',
+                          _from = f'{ext_data}',
                           _to = external_zip)
     # add the external payload to the payload/external/ref directory
     shutil.unpack_archive(external_zip,
@@ -357,8 +372,9 @@ def runPod(_cookie: str,
   importExternalPayload(_cookie = _cookie, _password = _password,
                         _where = _base_path, _payload = golem['payload'])
 
-  command = f'{golem["exec"]}'.split(' ')
-  command[-1] = f'{_base_path}/{command[-1]}'
+  command = [item.replace('[@]', f'{_base_path}/')
+             for item in golem["exec"].split(' ')]
+  # command[-1] = f'{_base_path}/{command[-1]}'
   print(f'Running pod `{" ".join(command)}`...')
   proc = subprocess.Popen(command)  
   proc.wait()
@@ -455,7 +471,7 @@ def runTask(_cookie: str,
     runPod(_cookie = _cookie, _password = _password,
            _recipe = recipe, _base_path = f'{_base_path}/{pod_name}')
     prev_output = f'{_base_path}/{pod_name}/output'
-  print('Task finished and the output is available at `{prev_output}`')      
+  print(f'Task finished and the output is available at `{prev_output}`')      
 
 # <-- Entry point: Main -->
 if __name__ == '__main__':
