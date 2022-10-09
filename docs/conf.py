@@ -1,29 +1,37 @@
-# .readthedocs.yaml
-# Read the Docs configuration file
-# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+# Configuration file for the Sphinx documentation builder.
 
-# Required
-version: 2
+# -- Project information
 
-# Set the version of Python and other tools you might need
-build:
-  os: ubuntu-22.04
-  tools:
-    python: "3.9"
-    # You can also specify other tool versions:
-    # nodejs: "16"
-    # rust: "1.55"
-    # golang: "1.17"
+project = 'Sovr'
+copyright = '2022, Reza Hasanzadeh'
+author = 'Reza Hasanzadeh'
 
-# Build documentation in the docs/ directory with Sphinx
-sphinx:
-   configuration: docs/conf.py
+release = '0.1'
+version = '0.1.0'
 
-# If using Sphinx, optionally build your docs in additional formats such as PDF
-# formats:
-#    - pdf
+# -- General configuration
 
-# Optionally declare the Python requirements required to build your docs
-#python:
-#   install:
-#   - requirements: docs/requirements.txt
+extensions = [
+    'sphinx.ext.duration',
+    'sphinx.ext.doctest',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.intersphinx',
+]
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3/', None),
+    'sphinx': ('https://www.sphinx-doc.org/en/master/', None),
+}
+intersphinx_disabled_domains = ['std']
+
+templates_path = ['_templates']
+
+master_doc = 'index'
+
+# -- Options for HTML output
+
+html_theme = 'sphinx_rtd_theme'
+
+# -- Options for EPUB output
+epub_show_urls = 'footnote'
