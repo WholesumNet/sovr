@@ -4,7 +4,7 @@
 
 project = 'Sovr'
 copyright = '2022, Reza Hasanzadeh'
-author = 'Graziella'
+author = 'Reza Hasanzadeh'
 
 release = '0.1'
 version = '0.1.0'
