@@ -43,28 +43,26 @@ To get the Sovr CLI, fork it from Github:
 If you needed any help, just invoke Sovr CLI with ``--help`` argument:
 ::
 
-.. code-block:: console
+  usage: cli.py [-h] [--recipe RECIPE] [--persist-self]
+              [--persist | --fork FORK | --run | --import-pod IMPORT_POD | --list-pods | --generate-pod-registry | --task TASK]
 
-  |  usage: cli.py [-h] [--recipe RECIPE] [--persist-self]
-  |              [--persist | --fork FORK | --run | --import-pod IMPORT_POD | --list-pods | --generate-pod-registry | --task TASK]
+  Sovr command line interface
 
-  |  Sovr command line interface
-
-  |   optional arguments:
-  |    -h, --help            show this help message and exit
-  |    --recipe RECIPE       specify a recipe file
-  |    --persist-self        Persist the CLI itself and make it public. Caution:
-  |                          remove any credentials(password files, ...) before
-  |                          proceeding.
-  |    --persist             Persist pod to dfs
-  |    --fork FORK           Fork a public pod, a reference key is expected
-  |    --run                 Run the pod
-  |    --import-pod IMPORT_POD
-  |                          Imports a pod to local filesystem, a pod name is
-  |                          expected
-  |    --list-pods           List all pods
-  |    --generate-pod-registry
-  |                          Generate a new pod registry by looking into all pods
-  |    --task TASK           Fork, import, and finally run all compute pods
-  |                          requested in a task description file, a task
-  |                          description file is expected.
+   optional arguments:
+    -h, --help            show this help message and exit
+    --recipe RECIPE       specify a recipe file
+    --persist-self        Persist the CLI itself and make it public. Caution:
+                          remove any credentials(password files, ...) before
+                          proceeding.
+    --persist             Persist pod to dfs
+    --fork FORK           Fork a public pod, a reference key is expected
+    --run                 Run the pod
+    --import-pod IMPORT_POD
+                          Imports a pod to local filesystem, a pod name is
+                          expected
+    --list-pods           List all pods
+    --generate-pod-registry
+                          Generate a new pod registry by looking into all pods
+    --task TASK           Fork, import, and finally run all compute pods
+                          requested in a task description file, a task
+                          description file is expected.
