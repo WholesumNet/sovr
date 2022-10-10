@@ -41,6 +41,7 @@ To get the Sovr CLI, fork it from Github:
   git clone https://github.com/LickliderCircle/sovr.git
 
 If you needed any help, just invoke Sovr CLI with ``--help`` argument:
+
 .. code-block:: console
 
   usage: cli.py [-h] [--recipe RECIPE] [--persist-self]
