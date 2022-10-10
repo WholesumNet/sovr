@@ -7,9 +7,9 @@ Prerequisites
 -------------
 There are few steps that need to be done before using the CLI:
 
-- Swarm
+- **Swarm**
   To setup the Swarm node, you need to consult https://docs.ethswarm.org/docs. Once your node is up, fund your wallet(you can request funds from Swarm discord), deploy a chequebook, and bingo! 
-- FairOS-DFS
+- **FairOS-DFS**
   To setup the FairOS-DFS tools, You need two files: `dfs-linux...` and `dfs-cli-linux...` which can be downloaded from https://github.com/fairDataSociety/fairOS-dfs. Please consult https://docs.fairos.fairdatasociety.org/docs/fairOS-dfs/introduction for further information on customizing FairOS-DFS.
   FairOS-DFS provides abstractions that facilitate the storage of fairly complex objects on Swarm so it needs a running Swarm node. Once the Swarm node and a FairOS-DFS server are up, you need to create a user(assuming the FairOS-DFS tools are located at `./bee`):
     Fire the dfs-cli:
@@ -17,12 +17,13 @@ There are few steps that need to be done before using the CLI:
 
       ./bee/dfs-cli-linux-[*your arch*]
     And then create a user:
-      .. code-block:: console
+    .. code-block:: console
 
-        user new *alice*
-    Provide a password for the new user and done. 
+      user new *alice*
+    Provide a password for the new user and the initial setup is complete. 
 
-- Golem is needed to run compute pods, so please consult https://handbook.golem.network/requestor-tutorials/flash-tutorial-of-requestor-development to set it up.
+- **Golem**
+ Golem is needed to run compute pods, so please consult https://handbook.golem.network/requestor-tutorials/flash-tutorial-of-requestor-development to set it up.
 
 Now that you have a working environment for Swarm, FairOS-DFS, and Golem, it is time to start using the Sovr CLI.
 
