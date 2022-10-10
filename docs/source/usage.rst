@@ -13,15 +13,13 @@ There are few steps that need to be done before using the CLI:
   To setup the FairOS-DFS tools, You need two files: `dfs-linux...` and `dfs-cli-linux...` which can be downloaded from https://github.com/fairDataSociety/fairOS-dfs. Please consult https://docs.fairos.fairdatasociety.org/docs/fairOS-dfs/introduction for further information on customizing FairOS-DFS.
   FairOS-DFS provides abstractions that facilitate the storage of fairly complex objects on Swarm so it needs a running Swarm node. Once the Swarm node and a FairOS-DFS server are up, you need to create a user(assuming the FairOS-DFS tools are located at `./bee`):
     Fire the dfs-cli:
-
     .. code-block:: console
 
-      ./bee/dfs-cli-linux-[arch]
+      ./bee/dfs-cli-linux-[*your arch*]
     And then create a user:
-
       .. code-block:: console
 
-        user new <alice>
+        user new *alice*
     Provide a password for the new user and done. 
 
 - Golem is needed to run compute pods, so please consult https://handbook.golem.network/requestor-tutorials/flash-tutorial-of-requestor-development to set it up.
@@ -38,28 +36,27 @@ To get the Sovr CLI, fork it from Github:
   git clone https://github.com/LickliderCircle/sovr.git
 
 If you needed help, just invoke Sovr CLI with `--help` argument:
-
 .. code-block:: console
-  usage: cli.py [-h] [--recipe RECIPE] [--persist-self]
-              [--persist | --fork FORK | --run | --import-pod IMPORT_POD | --list-pods | --generate-pod-registry | --task TASK]
+  >  usage: cli.py [-h] [--recipe RECIPE] [--persist-self]
+                [--persist | --fork FORK | --run | --import-pod IMPORT_POD | --list-pods | --generate-pod-registry | --task TASK]
 
-  Sovr command line interface
+  >  Sovr command line interface
 
-  optional arguments:
-    -h, --help            show this help message and exit
-    --recipe RECIPE       specify a recipe file
-    --persist-self        Persist the CLI itself and make it public. Caution:
-                          remove any credentials(password files, ...) before
-                          proceeding.
-    --persist             Persist pod to dfs
-    --fork FORK           Fork a public pod, a reference key is expected
-    --run                 Run the pod
-    --import-pod IMPORT_POD
-                          Imports a pod to local filesystem, a pod name is
-                          expected
-    --list-pods           List all pods
-    --generate-pod-registry
-                          Generate a new pod registry by looking into all pods
-    --task TASK           Fork, import, and finally run all compute pods
-                          requested in a task description file, a task
-                          description file is expected.
+  >   optional arguments:
+  >    -h, --help            show this help message and exit
+  >    --recipe RECIPE       specify a recipe file
+  >    --persist-self        Persist the CLI itself and make it public. Caution:
+  >                          remove any credentials(password files, ...) before
+  >                          proceeding.
+  >    --persist             Persist pod to dfs
+  >    --fork FORK           Fork a public pod, a reference key is expected
+  >    --run                 Run the pod
+  >    --import-pod IMPORT_POD
+  >                          Imports a pod to local filesystem, a pod name is
+  >                          expected
+  >    --list-pods           List all pods
+  >    --generate-pod-registry
+  >                          Generate a new pod registry by looking into all pods
+  >    --task TASK           Fork, import, and finally run all compute pods
+  >                          requested in a task description file, a task
+  >                          description file is expected.
