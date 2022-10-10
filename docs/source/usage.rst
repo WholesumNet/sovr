@@ -16,13 +16,13 @@ There are few steps that need to be done before using the CLI:
 
     .. code-block:: console
 
-      ./bee/dfs-cli-linux-[*your arch*]
+      ./bee/dfs-cli-linux-[your-arch]
 
     And then create a user:
 
     .. code-block:: console
 
-      user new *alice*
+      user new [your-username]
 
     Provide a password for the new user and the initial setup is complete. 
 
