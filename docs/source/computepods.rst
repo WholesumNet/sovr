@@ -145,13 +145,29 @@ Once the compute pod is ready to be persisted, the recipe could demand the outpu
       .
     },
 
-This brings us to the point where the need to chain tasks is felt.
+This brings us to the point where the need for complex workflow management is felt.
 
 Tasks
 -----
-A task is 
+A *task* is a set of independent compute pods loosely chained together to perform a complex workflow. A task is defined in a json file and has the following look and feel:
 
-Quick dive
-^^^^^^^^^^
+.. code-block:: text
+
+  {
+    "name": "some sequence",
+    "pods": [
+      "96dd1...59670",
+      "e3f8c...55eb4"
+    ]
+  }
+
+Where the ``pods`` property defines a list of compute pods that constitute the task. To run a task you can invoke the Sovr CLI as below:
+
+.. code-block:: console
+
+  python src/cli.py --task foo/task.json
+
+Running a task involves forking and running individual compute pods. After each compute pod is run, the contents of the *output* is copied to the next compute pod's *paylaod/external* directory, thus enabling dependency of compute pods to each other. To get your feet wet with tasks, there is an example task in ``src/templates/tasks/ml/keras/task.json`` where 5 images are sent to different pre-trained Keras models to be classified.
+
 
    
