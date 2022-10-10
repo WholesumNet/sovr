@@ -40,9 +40,11 @@ To get the Sovr CLI, fork it from Github:
 
   git clone https://github.com/LickliderCircle/sovr.git
 
-If you needed help, just invoke Sovr CLI with ``--help`` argument:
+If you needed any help, just invoke Sovr CLI with ``--help`` argument:
+::
 
 .. code-block:: console
+
   |  usage: cli.py [-h] [--recipe RECIPE] [--persist-self]
   |              [--persist | --fork FORK | --run | --import-pod IMPORT_POD | --list-pods | --generate-pod-registry | --task TASK]
 
