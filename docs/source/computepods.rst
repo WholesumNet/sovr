@@ -25,28 +25,49 @@ A compute pod is a `logical directory structure <https://docs.fairos.fairdatasoc
 The description of recipe properties, although clear, is provided here:
 
 - ``name``
+
   This property identifies the compute pod within the FairOS-DFS and thus should be unique for every compute pod.
+
 - ``description``
+
   A description of the objective of the compute pod
+
 - ``author``
+
   The author of the compute pod
+
 - ``version``
+
   Version number
+
 - ``public``
+
   Whether the compute pod should be shared with others
+
 - ``golem``
+
   Defines a Golem program
 
   - ``exec``
+
     The command that starts a Golem session run  
+
   - ``script``
+
     The logic of the Golem program is out here
+
   - ``payload``
+
     Defines the payload(input) of the Golem program
+
   - ``output``
+
     The output of the Golem program 
+
   - ``log``
+
     The logs of any Golem session runs
+    
 
 Compute Pods
 ------------
