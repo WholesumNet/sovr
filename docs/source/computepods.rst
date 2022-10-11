@@ -149,7 +149,11 @@ The message of computes pod is simple yet powerful. Using compute pods, people c
 
 Tasks
 -----
-A *task* is a set of independent compute pods loosely chained together to undertake a complex job. A task is defined in a json file and has the following look and feel:
+A *task* is a set of independent compute pods loosely chained together to undertake a complex job. The following image demonstrates a visual conception of tasks.
+  
+  .. image:: https://raw.githubusercontent.com/LickliderCircle/sovr/main/docs/assets/task.png
+
+A task is defined in a json file and has the following look and feel:
 
 .. code-block:: text
 
