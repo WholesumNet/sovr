@@ -2,7 +2,7 @@ Compute Pods
 ============
 Overview
 --------
-Golem is a peer-to-peer compute marketplace where requestors(those who need to get some compute done) and providers(those who provide their computer in exchange for $) are matched together in a decentralised way. A typical program on Golem is usually a set of ``payload(inputs)``, ``scripts``, ``logs``, and ``outputs`` with *scripts* controlling the logic of the whole running session. Note that this is a loose definition of a Golem program as there is no pre-defined structure and developers are free to layout their program files in any manner way the wish, but for the sake of tidiness lets agree on an informal layout for Golem programs here where 4 directories, mentioned above, constitute a Golem program.
+Golem is a peer-to-peer compute marketplace where requestors(those who need to get some compute done) and providers(those who provide their computer in exchange for $) are matched together in a decentralised way. A typical program on Golem is usually a set of ``payload(inputs)``, ``scripts``, ``logs``, and ``outputs`` with *scripts* controlling the logic of the whole running session. Note however that this is a loose definition of a Golem program as there is no such pre-defined structure and developers are free to layout their program files in any manner the wish and the layout Sovr uses is only for the sake of tidiness. 
 
 A compute pod is a `logical directory structure <https://docs.fairos.fairdatasociety.org/docs/fairOS-dfs/introduction#pod--logical-drive>`_ that contains directories and files representing a program that can be run on Golem. To differentiate a compute pod from typical pods, recall that users might have other pods in their wallet too, a ``.recipe`` file is stored at the root of the compute pods, e.g. ``/segmentation-job.recipe``. A recipe is a json file with the following look and feel:
 
@@ -195,9 +195,9 @@ To make this introduction to compute pods solid, an example is provided here tha
 
       user new sam
 
-    Provide a password for *sam* and exit the FairOS-DFS CLI
+    Provide a password for *sam* and exit the FairOS-DFS CLI.
 
-  - Open your favourite text editor and write the following text in it and save it in the Sovr CLI's ``src`` directory(I hope you've already clonned Sovr CLI, if not please consult :doc:`usage`) as ``creds.json``
+  - Open your favourite text editor and write the following text in it then save it in the Sovr CLI's ``src`` directory(I hope you've already clonned Sovr CLI, if not please consult :doc:`usage`) as ``creds.json``.
 
     .. code-block:: text
 
@@ -206,47 +206,18 @@ To make this introduction to compute pods solid, an example is provided here tha
         "password": "sam's password"
       }
 
-2. Set Golem up
-  - In a new terminal tab/window, and run
-
-    .. code-block:: console
-
-      yagna service run
-
-  - Open another terminal tab/window, and run
-
-    .. code-block:: console
-
-      yagna app-key list
-
-    You would get something close to this
-
-    .. code-block:: text
-
-      ┌─────────────┬────────────────────────────────────┬──────────────────────────────────────────────┬───────────┬─────────────────────────────────┐
-      │  name       │  key                               │  id                                          │  role     │  created                        │
-      ├─────────────┼────────────────────────────────────┼──────────────────────────────────────────────┼───────────┼─────────────────────────────────┤
-      │  requestor  │  1c8c96a66950905baeb48014d7369ac6  │  0xb2e10dacce97f932f1d03757ff33b443f17a1c5f  │  manager  │  2022-10-06T13:45:04.897349774  │
-      └─────────────┴────────────────────────────────────┴──────────────────────────────────────────────┴───────────┴─────────────────────────────────┘
-
-    Copy the value at the ``key`` column and run
-
-    .. code-block:: console
-
-      yagna payment init --sender
-      export YAGNA_APPKEY=1c8c96a66950905baeb48014d7369ac6
-
-    And done, Golem is ready to serve your compute orders.
+2. Set Golem up as described here ::doc::`usage`
 
 3. Fork, run, and persist a compute pod
   While in the same terminal tab/window, make sure you are at Sovr CLI's directory ``sovr`` and the virtual environment you set up at :doc:`usage` is activated.
+  
   - To fork a compute pod containing a `XCeption` Keras image classification model, run
 
     .. code-block:: console
 
       python src/cli.py --fork a61d11e7335ed41e56494ae4bee5446f7785737938a35454e3190c5ccae283ea
 
-    Once the forking is complete, you would have ``XCeption`` directory at your current woking directory. Feel free to explore it.
+    Once the forking is complete, you would have ``XCeption`` directory at your current woking directory, feel free to explore it.
 
   - To run the forked `XCeption` compute pod, run
 
@@ -254,7 +225,7 @@ To make this introduction to compute pods solid, an example is provided here tha
 
       python src/cli.py --recipe src/XCeption/recipe.py --run
 
-    This send your compute pod's stuff to Golem nodes and once done, your compute pod's results are ready at ``XCeption/outupt`` along with any logs at ``XCeption/logs``
+    This will send your compute pod's stuff to Golem nodes and once done, your compute pod's results are ready at ``XCeption/outupt`` along with any logs at ``XCeption/logs``. For this specific compute pod, the actual result is ``XCeption/output/preds.json`` which is the top 5 classes the model thought the five input images are.
 
   - If you are satisfied with the outputs or just interested in saving your compute pod on Swarm, run
 
@@ -264,7 +235,7 @@ To make this introduction to compute pods solid, an example is provided here tha
 
     If there are no harmless errors, you should get a message on the successful persistence of your compute pod along with a sharing reference key if your recipe's ``public`` property was *True*. 
 
-    Congrats, you have completed your very first compute pod journey!
+Congrats, you have completed your very first compute pod journey!
 
 As an alternative to forking, there are some template compute pods and tasks in the ``src/templates`` directory, feel free to examine them. 
 
