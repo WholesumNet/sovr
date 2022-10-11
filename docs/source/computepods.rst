@@ -2,7 +2,7 @@ Compute Pods
 ============
 Overview
 --------
-Golem is a peer-to-peer compute marketplace where requestors and providers are matched together in a decentralised way. A typical program on Golem is usually a set of ``payload(inputs)``, ``scripts``, ``logs``, and ``outputs`` with *scripts* controlling the logic of the whole running session. Note that this is a loose definition of a Golem program as there is no pre-defined structure and developers are free to layout their program files in any manner way the wish, but for the sake of tidiness lets agree on an informal layout for Golem programs here where 4 directories, mentioned above, constitute a Golem program.
+Golem is a peer-to-peer compute marketplace where requestors(those who need to get some compute done) and providers(those who provide their computer in exchange for $) are matched together in a decentralised way. A typical program on Golem is usually a set of ``payload(inputs)``, ``scripts``, ``logs``, and ``outputs`` with *scripts* controlling the logic of the whole running session. Note that this is a loose definition of a Golem program as there is no pre-defined structure and developers are free to layout their program files in any manner way the wish, but for the sake of tidiness lets agree on an informal layout for Golem programs here where 4 directories, mentioned above, constitute a Golem program.
 
 A compute pod is a `logical directory structure <https://docs.fairos.fairdatasociety.org/docs/fairOS-dfs/introduction#pod--logical-drive>`_ that contains directories and files representing a program that can be run on Golem. To differentiate a compute pod from typical pods, recall that users might have other pods in their wallet too, a ``.recipe`` file is stored at the root of the compute pods, e.g. ``/segmentation-job.recipe``. A recipe is a json file with the following look and feel:
 
@@ -68,13 +68,13 @@ A compute pod is a `logical directory structure <https://docs.fairos.fairdatasoc
     The logs of any Golem session runs
 
 
-Compute Pods
-------------
-Compute pods are the main building block of the Sovr Protocol and provide an easy to use scheme to manage Golem compute objects. Compute pods can be run, persisted, shared, and forked by users in a decentralized way. This allows them to be viewed as portable compute objects. Compute pods might experience various independent stages during their lifetime:
+What is a Compute Pod?
+----------------------
+A compute pod is the main building block of the Sovr Protocol that provide an easy to use scheme to manage Golem compute session. Compute pods can be run, persisted, shared, and forked by users in a decentralized way. This allows them to be viewed as portable compute objects. Compute pods might experience various independent stages during their lifetime:
 
 - *Running*
 
-  A running compute pod is simply a Golem program. An example of running is shown below:
+  A running compute pod is simply a Golem program. An example of running a compute pod via Sovr CLI is shown below:
 
   .. code-block:: console
 
@@ -83,7 +83,7 @@ Compute pods are the main building block of the Sovr Protocol and provide an eas
 
 - *Persisting*
 
-  A compute pod can be persisted to the FairOS-DFS with the ``--persist`` option of CLI. When persisting, if the ``public`` property of the recipe is set to **True**, the compute pod is also shared to the outside world. An example of persisting is shown below: 
+  A compute pod can be saved(persisted) to the FairOS-DFS with the ``--persist`` option of Sovr CLI. When persisting, if the ``public`` property of the recipe is set to **True**, the compute pod is also shared to the outside world. An example of persisting is shown below: 
 
   .. code-block:: console
 
@@ -97,11 +97,11 @@ Compute pods are the main building block of the Sovr Protocol and provide an eas
 
     python src/cli.py --fork 2cf98c3...23ee9a
 
-Besides working with compute pods, Sovr CLI provide means to maintain the overall auditing and maintenance of itself and compute pods. ``--persist-self`` for exaample, persists a copy of the CLI(the ``src/`` directory) on Swarm and shares it as a measure of redundancy. Another set of options revolve around the maintenance of compute pods with ``--list-pods`` providing a list of current compute pods and ``--generate-pod-registry`` creating a registry of compute pods as users could have several other pods too.
+Besides working with compute pods, Sovr CLI provides means to maintain the overall status of itself and compute pods. ``--persist-self`` for example, persists a copy of Sovr CLI(the ``src/`` directory) on Swarm and shares it as a measure of redundancy. Another set of options revolve around the maintenance of compute pods with ``--list-pods`` providing a list of current compute pods and ``--generate-pod-registry`` creating a registry of compute pods as users could have several other pods too and it is important to track compute pods down.
 
 Payload and output
 ^^^^^^^^^^^^^^^^^^
-The notion of *payload* is very important for compute pods as it provides means to communicate with other compute pods. A recipe defines what payload the compute pod expects and there are two types of payloads: internal, and external. An internal payload is simply set of files stored in the ``payload`` property's value's directory while an external paylaod is a set of references to public pods. The following snippet defines an external payload:
+The notion of *payload* is very important for a compute pod as it provides means to communicate with other compute pods. A recipe defines what payload the compute pod expects. There are two types of payloads: *internal*, and *external*. An internal payload is simply the set of local files stored in the ``payload`` property's directory while an external paylaod is a set of references to public pods. The following snippet shows and example of an external payload:
 
 .. code-block:: text
 
@@ -128,8 +128,8 @@ The notion of *payload* is very important for compute pods as it provides means 
     .
   }, 
 
-As you can see the paylaod requires external stuff stored on public pods that need to be forked before a compute pod could run. This is taken care of by the Sovr CLI when running starts by downlaoding the external payload into the ``paylaod/external`` direcory.
-Once the compute pod is ready to be persisted, the recipe could demand the output to be shared too. An example of a output sharing is given below:
+As you can see the paylaod requires external resource stored on public pods that need to be forked before a compute pod could use them. This is taken care of by the Sovr CLI when running a compute pod. All external payloads are stored in the ``paylaod/external`` direcory.
+Once a compute pod is ready to be persisted, the recipe could ask for its output to be shared. An example of a output sharing is given below:
 
 .. code-block:: text
 
@@ -145,11 +145,11 @@ Once the compute pod is ready to be persisted, the recipe could demand the outpu
       .
     },
 
-This brings us to the point where the need for complex workflow management is felt.
+The message of computes pod is simple yet powerful. Using compute pods, people can autmate things and build on top of others' work.
 
 Tasks
 -----
-A *task* is a set of independent compute pods loosely chained together to perform a complex workflow. A task is defined in a json file and has the following look and feel:
+A *task* is a set of independent compute pods loosely chained together to undertake a complex job. A task is defined in a json file and has the following look and feel:
 
 .. code-block:: text
 
@@ -170,4 +170,113 @@ Where the ``pods`` property defines a list of compute pods that constitute the t
 Running a task involves forking and running individual compute pods. After each compute pod is run, the contents of the *output* is copied to the next compute pod's *paylaod/external* directory, thus enabling dependency of compute pods to each other. To get your feet wet with tasks, there is an example task in ``src/templates/tasks/ml/keras/task.json`` where 5 images are sent to different pre-trained Keras models to be classified.
 
 
-   
+Quick dive
+----------
+To make this introduction to compute pods solid, an example is provided here that let's you run and examine a compute pod we have already persisted in Swarm.
+
+1. Set up a user within the FairOS-DFS environment
+  We assume that FairOS-DFS tools are located at **./bee/** and our system's architecture is the common 64-bit "x86_64" known as *amd64*
+  
+  - Open a terminal window and run(replace the postage block id Swarm gave you with *foobar*)
+
+    .. code-block:: console
+
+      ./bee/dfs-linux-amd64 server --postageBlockId "foobar"
+
+  - In another terminal tab/window, run
+
+    .. code-block:: console
+
+      ./bee/dfs-cli-linux-amd64
+
+    Now that you are inside the FairOS-DFS CLI, let's create a user named *sam* or name it as you like
+    
+    .. code-block:: console
+
+      user new sam
+
+    Provide a password for *sam* and exit the FairOS-DFS CLI
+
+  - Open your favourite text editor and write the following text in it and save it in the Sovr CLI's ``src`` directory(I hope you've already clonned Sovr CLI, if not please consult :doc:`usage`) as ``creds.json``
+
+    .. code-block:: text
+
+      {
+        "username": "sam",
+        "password": "sam's password"
+      }
+
+2. Set Golem up
+  - In a new terminal tab/window, and run
+
+    .. code-block:: console
+
+      yagna service run
+
+  - Open another terminal tab/window, and run
+
+    .. code-block:: console
+
+      yagna app-key list
+
+    You would get something close to this
+
+    .. code-block:: text
+
+      ┌─────────────┬────────────────────────────────────┬──────────────────────────────────────────────┬───────────┬─────────────────────────────────┐
+      │  name       │  key                               │  id                                          │  role     │  created                        │
+      ├─────────────┼────────────────────────────────────┼──────────────────────────────────────────────┼───────────┼─────────────────────────────────┤
+      │  requestor  │  1c8c96a66950905baeb48014d7369ac6  │  0xb2e10dacce97f932f1d03757ff33b443f17a1c5f  │  manager  │  2022-10-06T13:45:04.897349774  │
+      └─────────────┴────────────────────────────────────┴──────────────────────────────────────────────┴───────────┴─────────────────────────────────┘
+
+    Copy the value at the ``key`` column and run
+
+    .. code-block:: console
+
+      yagna payment init --sender
+      export YAGNA_APPKEY=1c8c96a66950905baeb48014d7369ac6
+
+    And done, Golem is ready to serve your compute orders.
+
+3. Fork, run, and persist a compute pod
+  While in the same terminal tab/window, make sure you are at Sovr CLI's directory ``sovr`` and the virtual environment you set up at :doc:`usage` is activated.
+  - To fork a compute pod containing a `XCeption` Keras image classification model, run
+
+    .. code-block:: console
+
+      python src/cli.py --fork a61d11e7335ed41e56494ae4bee5446f7785737938a35454e3190c5ccae283ea
+
+    Once the forking is complete, you would have ``XCeption`` directory at your current woking directory. Feel free to explore it.
+
+  - To run the forked `XCeption` compute pod, run
+
+    .. code-block:: console
+
+      python src/cli.py --recipe src/XCeption/recipe.py --run
+
+    This send your compute pod's stuff to Golem nodes and once done, your compute pod's results are ready at ``XCeption/outupt`` along with any logs at ``XCeption/logs``
+
+  - If you are satisfied with the outputs or just interested in saving your compute pod on Swarm, run
+
+    .. code-block:: console
+
+      python src/cli.py --recipe src/XCeption/recipe.py --persist
+
+    If there are no harmless errors, you should get a message on the successful persistence of your compute pod along with a sharing reference key if your recipe's ``public`` property was *True*. 
+
+    Congrats, you have completed your very first compute pod journey!
+
+As an alternative to forking, there are some template compute pods and tasks in the ``src/templates`` directory, feel free to examine them. 
+
+
+
+
+
+
+
+
+
+
+
+
+  
