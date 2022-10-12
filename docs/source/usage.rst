@@ -87,7 +87,7 @@ There are few steps that need to be done before using the CLI:
 
     .. code-block:: console
 
-      python3 -m venv .envs/venv
+      python3 -m venv ~/.envs/venv
       source ~/.envs/venv/bin/activate
       
       pip install -U pip

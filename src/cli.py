@@ -535,7 +535,8 @@ if __name__ == '__main__':
             _cookie = cookie, _password = creds['password']) 
 
   elif args.fork:
-    fork(args.fork, cookie, creds['password'])
+    fork(_cookie = cookie, _password = creds['password'],
+         _reference = args.fork)
 
   elif args.run:
     recipe_path = f'{pathlib.Path(args.recipe).parent.resolve()}'

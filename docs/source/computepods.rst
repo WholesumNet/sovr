@@ -210,7 +210,7 @@ To make this introduction to compute pods solid, an example is provided here tha
         "password": "sam's password"
       }
 
-2. Set Golem up as described here ::doc::`usage`
+2. Set Golem up as described here :doc:`usage`
 
 3. Fork, run, and persist a compute pod
   While in the same terminal tab/window, make sure you are at Sovr CLI's directory ``sovr`` and the virtual environment you set up at :doc:`usage` is activated.
