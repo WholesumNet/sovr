@@ -227,7 +227,7 @@ To make this introduction to compute pods solid, an example is provided here tha
 
     .. code-block:: console
 
-      python src/cli.py --recipe src/XCeption/recipe.py --run
+      python src/cli.py --recipe ./XCeption/recipe.py --run
 
     This will send your compute pod's stuff to Golem nodes and once done, your compute pod's results are ready at ``XCeption/outupt`` along with any logs at ``XCeption/logs``. For this specific compute pod, the actual result is ``XCeption/output/preds.json`` which is the top 5 classes the model thought the five input images are.
 

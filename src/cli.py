@@ -108,7 +108,7 @@ def persist(_recipe: dict,
       },
     )
     if response.status_code != 200:
-      print(f'Failed to share the pod, status_code: {response.status_code}, message: {respons.json()["message"]}')  
+      print(f'Failed to share the pod, status_code: {response.status_code}, message: {response.json()["message"]}')  
     else:
       sharing_reference = response.json()['pod_sharing_reference']
       print(f'Pod is now public. For future forks, please note this sharing reference: ' \
@@ -403,7 +403,8 @@ def fork(_cookie: str,
   )
   if response.status_code == 200:
     pod_info = response.json()
-    print(f'Got some info about the pod: {pod_info}')
+    pp = pprint.PrettyPrinter()    
+    pp.pprint(pod_info)
   else:
     print(f'Failed to get any info about the pod. status_code: {response.status_code}, message: {response.json()["message"]}')
     return None
