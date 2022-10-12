@@ -91,7 +91,7 @@ There are few steps that need to be done before using the CLI:
       source ~/.envs/venv/bin/activate
       
       pip install -U pip
-      pip install yapapi, requests-toolbelt
+      pip install yapapi requests-toolbelt
 
   And done! 
 
