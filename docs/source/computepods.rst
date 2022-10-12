@@ -227,7 +227,7 @@ To make this introduction to compute pods solid, an example is provided here tha
 
     .. code-block:: console
 
-      python src/cli.py --recipe ./XCeption/recipe.py --run
+      python src/cli.py --recipe ./XCeption/recipe.json --run
 
     This will send your compute pod's stuff to Golem nodes and once done, your compute pod's results are ready at ``XCeption/outupt`` along with any logs at ``XCeption/logs``. For this specific compute pod, the actual result is ``XCeption/output/preds.json`` which is the top 5 classes the model thought the five input images are.
 
@@ -235,7 +235,7 @@ To make this introduction to compute pods solid, an example is provided here tha
 
     .. code-block:: console
 
-      python src/cli.py --recipe src/XCeption/recipe.py --persist
+      python src/cli.py --recipe src/XCeption/recipe.json --persist
 
     If there are no harmless errors, you should get a message on the successful persistence of your compute pod along with a sharing reference key if your recipe's ``public`` property was *True*. 
 
