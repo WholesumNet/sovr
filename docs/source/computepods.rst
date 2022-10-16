@@ -101,7 +101,7 @@ Besides working with compute pods, Sovr CLI provides means to maintain the overa
 
 Payload and output
 ^^^^^^^^^^^^^^^^^^
-The notion of *payload* is very important for a compute pod as it provides means to communicate with other compute pods. A recipe defines what payload the compute pod expects. There are two types of payloads: *internal*, and *external*. An internal payload is simply the set of local files stored in the ``payload`` property's directory while an external paylaod is a set of references to public pods. The following snippet shows and example of an external payload:
+The notion of *payload* is very important for a compute pod as it provides means to communicate with other compute pods. A recipe defines what payload the compute pod expects. There are two types of payloads: *internal*, and *external*. An internal payload is simply the set of local files stored in the directory defined by the ``payload`` property while an external payload is a set of references to public pods. The following snippet shows an external payload:
 
 .. code-block:: text
 
@@ -128,7 +128,7 @@ The notion of *payload* is very important for a compute pod as it provides means
     .
   }, 
 
-As you can see the paylaod requires external resource stored on public pods that need to be forked before a compute pod could use them. This is taken care of by the Sovr CLI when running a compute pod. All external payloads are stored in the ``paylaod/external`` direcory.
+As you can see the payload requires external resource stored on public pods that need to be forked before a compute pod could use them. This is taken care of by the Sovr CLI when running a compute pod and stored in the ``payload/external`` direcory.
 Once a compute pod is ready to be persisted, the recipe could ask for its output to be shared. An example of a output sharing is given below:
 
 .. code-block:: text
@@ -145,7 +145,7 @@ Once a compute pod is ready to be persisted, the recipe could ask for its output
       .
     },
 
-The message of computes pod is simple yet powerful. Using compute pods, people can autmate things and build on top of others' work.
+The overall message of computes pod is simple yet powerful. Using compute pods, people can autmate things and build on top of others' work.
 
 Tasks
 -----
@@ -171,7 +171,7 @@ Where the ``pods`` property defines a list of compute pods that constitute the t
 
   python src/cli.py --task foo/task.json
 
-Running a task involves forking and running individual compute pods. After each compute pod is run, the contents of the *output* is copied to the next compute pod's *paylaod/external* directory, thus enabling dependency of compute pods to each other. To get your feet wet with tasks, there is an example task in ``src/templates/tasks/ml/keras/task.json`` where 5 images are sent to different pre-trained Keras models to be classified.
+Running a task involves forking and running individual compute pods. After each compute pod is run, the contents of the *output* is copied to the next compute pod's *payload/external* directory, thus enabling dependency of compute pods to each other. To get your feet wet with tasks, there is an example task in ``src/templates/tasks/ml/keras/task.json`` where 5 images are sent to different pre-trained Keras models to be classified.
 
 
 Quick dive
