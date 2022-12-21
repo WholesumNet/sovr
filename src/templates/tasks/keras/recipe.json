@@ -1,6 +1,7 @@
 {
   "name": "keras",
   "description": "Keras applications as compute pods, each pod is a model",
+  "public": true,
   "pods": [
     "de54ac9d712250b80edfac9cc70bf02e21dce4feae73e8ac521024de4e0a988b",
     "a61d11e7335ed41e56494ae4bee5446f7785737938a35454e3190c5ccae283ea",

@@ -151,14 +151,15 @@ Tasks
 -----
 A *task* is a set of independent compute pods loosely chained together to undertake a complex job. The following image demonstrates a visual conception of tasks.
   
-  .. image:: https://raw.githubusercontent.com/LickliderCircle/sovr/main/docs/assets/task.png
+  .. image:: https://raw.githubusercontent.com/rezahsnz/sovr/main/docs/assets/task.png
 
-A task is defined in a json file and has the following look and feel:
+A task is defined in a json file(usually called recipe.json just in the case of compute pods) and has the following look and feel:
 
 .. code-block:: text
 
   {
     "name": "some sequence",
+    "public": true,
     "pods": [
       "96dd1...59670",
       "e3f8c...55eb4"
@@ -169,9 +170,9 @@ Where the ``pods`` property defines a list of compute pods that constitute the t
 
 .. code-block:: console
 
-  python src/cli.py --task foo/task.json
+  python src/cli.py --recipe foo/recipe.json --run
 
-Running a task involves forking and running individual compute pods. After each compute pod is run, the contents of the *output* is copied to the next compute pod's *payload/external* directory, thus enabling dependency of compute pods to each other. To get your feet wet with tasks, there is an example task in ``src/templates/tasks/ml/keras/task.json`` where 5 images are sent to different pre-trained Keras models to be classified.
+Running a task involves forking and running individual compute pods. After each compute pod is run, the contents of the *output* is copied to the next compute pod's *payload/external* directory, thus enabling dependency of compute pods to each other. To get your feet wet with tasks, there is an example task in ``src/templates/tasks/ml/keras/recipe.json`` where 5 images are sent to different pre-trained Keras models to be classified.
 
 
 Quick dive
