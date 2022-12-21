@@ -67,7 +67,7 @@ def persist(_recipe: dict,
             _cookie: str,
             _password: str) -> None:
   '''
-  persist compute pod on the FDS and register it
+  persist compute pod/task to DFS
   '''
   if not _recipe: 
     return
@@ -84,7 +84,7 @@ def persist(_recipe: dict,
   helpers.open_pod(_cookie = _cookie, _password = creds['password'],
                    _pod_name = pod_name)
   # zip and upload 
-  print('Uploading pods...')
+  print('Uploading pod...')
   recipe_dir = pathlib.Path(_recipe_path).parent.resolve()
   shutil.make_archive(f'{pod_name}', 'zip', f'{recipe_dir}')
   res = helpers.upload_file(_cookie = _cookie, _pod_name = pod_name,
@@ -160,42 +160,43 @@ def persist(_recipe: dict,
   else:
     print(f'Registration failed. status_code: `{upload_status_code}`, message: `{res["message"]}`')
   helpers.remove_file(f'./{PodRegistryFilePath}')  
-  # share output
-  output = recipe['golem']['output']
-  if type(output) == dict:
-    '''
-    Share a subdir of the output as a public pod
-    .
-    .
-    .
-    "golem": {
-      "exec": "python3 script/blender.py",
-      "script": "script",
-      "payload": {
-        "pod": "ej38x1...1a20fd",
-        "files": ["/aloha/mahalo.blend"]
-      },
-      "output": {
-        "share": "output/actuals"
-      },
-      "log": "logs"
-    }
-    .
-    .
-    .
-    '''
-    output_pod_name = 'output-' + pod_name
-    helpers.remove_file(f'./{output_pod_name}.zip')
-    output_share_dir = pathlib.Path(f'{_recipe_path}/{output["share"]}').resolve()
-    shutil.make_archive(f'{output_pod_name}', 'zip', f'{output_share_dir}')
-    helpers.new_pod(_cookie = _cookie, _password = creds['password'],
-                    _pod_name = output_pod_name)
-    helpers.open_pod(_cookie = _cookie, _password = creds['password'],
-                     _pod_name = output_pod_name)    
-    res = helpers.upload_file(_cookie = _cookie, _pod_name = output_pod_name,
-                              _pod_dir = '/', _local_filepath = f'./{output_pod_name}.zip')
-    if res['status_code'] != 200:
-      print(f'Failed to share the output, status_code: {res["status_code"]}, message: {res["message"]}')    
+  # share output of the compute pod
+  if recipe.get('golem'):
+    output = recipe['golem']['output']
+    if type(output) == dict:
+      '''
+      Share a subdir of the output as a public pod
+      .
+      .
+      .
+      "golem": {
+        "exec": "python3 script/blender.py",
+        "script": "script",
+        "payload": {
+          "pod": "ej38x1...1a20fd",
+          "files": ["/aloha/mahalo.blend"]
+        },
+        "output": {
+          "share": "output/actuals"
+        },
+        "log": "logs"
+      }
+      .
+      .
+      .
+      '''
+      output_pod_name = 'output-' + pod_name
+      helpers.remove_file(f'./{output_pod_name}.zip')
+      output_share_dir = pathlib.Path(f'{_recipe_path}/{output["share"]}').resolve()
+      shutil.make_archive(f'{output_pod_name}', 'zip', f'{output_share_dir}')
+      helpers.new_pod(_cookie = _cookie, _password = creds['password'],
+                      _pod_name = output_pod_name)
+      helpers.open_pod(_cookie = _cookie, _password = creds['password'],
+                       _pod_name = output_pod_name)    
+      res = helpers.upload_file(_cookie = _cookie, _pod_name = output_pod_name,
+                                _pod_dir = '/', _local_filepath = f'./{output_pod_name}.zip')
+      if res['status_code'] != 200:
+        print(f'Failed to share the output, status_code: {res["status_code"]}, message: {res["message"]}')    
 
 
 def pods(_cookie: str,
@@ -433,7 +434,7 @@ def runTask(_cookie: str,
             _task: dict,
             _base_path: str = '.') -> None:
   '''
-  Given a task description file with the following structure, run compute pods
+  Given a recipe file with the following structure, run compute pods
   one by one.
   {
     "name": "ML pipeline",
@@ -487,15 +488,15 @@ if __name__ == '__main__':
   group.add_argument('--fork',
                       help = 'Fork a public pod, a reference key is expected')  
   group.add_argument('--run', action = 'store_true',
-                      help = 'Run the pod')
+                      help = 'Run the pod/task')
   group.add_argument('--import-pod',
                      help = 'Imports a pod to local filesystem, a pod name is expected')
   group.add_argument('--list-pods', action = 'store_true',
                      help = 'List all pods')  
   group.add_argument('--generate-pod-registry', action = 'store_true',
                      help = 'Generate a new pod registry by looking into all pods')
-  group.add_argument('--task',
-                     help = 'Fork, import, and finally run all compute pods requested in a task description file, a task description file is expected.')
+  #group.add_argument('--task',
+  #                   help = 'Fork, import, and finally run all compute pods requested in a task description file, a task description file is expected.')
   args = parser.parse_args()
   
   creds = None  
@@ -541,8 +542,14 @@ if __name__ == '__main__':
 
   elif args.run:
     recipe_path = f'{pathlib.Path(args.recipe).parent.resolve()}'
-    runPod(_cookie = cookie, _password = creds['password'],
-           _recipe = recipe, _base_path = recipe_path)
+    if recipe.get('golem'):
+      runPod(_cookie = cookie, _password = creds['password'],
+             _recipe = recipe, _base_path = recipe_path)
+    elif recipe['pods']:
+      runTask(_cookie = cookie, _password = creds['password'],
+              _task = recipe, _base_path = recipe_path)
+    else:
+      print('No valid recipe for a compute pod or a task was provided.')
 
   elif args.import_pod:
     importPod(_cookie = cookie, _password = creds['password'],
@@ -561,16 +568,16 @@ if __name__ == '__main__':
   elif args.generate_pod_registry:
     generatePodRegistry(_cookie = cookie, _password = creds['password'])
     
-  elif args.task:
-    task_path = f'{pathlib.Path(args.task).parent.resolve()}'
-    task = None
-    with open(args.task, "r") as f:
-      task = json.loads(f.read())
-    if task:
-      runTask(_cookie = cookie, _password = creds['password'],
-              _task = task, _base_path = task_path)
-    else:
-      print('Could not start the task, please make sure the task description file is fine.')
+  #elif args.task:
+  #  task_path = f'{pathlib.Path(args.task).parent.resolve()}'
+  #  task = None
+  #  with open(args.task, "r") as f:
+  #    task = json.loads(f.read())
+  #  if task:
+  #    runTask(_cookie = cookie, _password = creds['password'],
+  #            _task = task, _base_path = task_path)
+  #  else:
+  #    print('Could not start the task, please make sure the task description file is fine.')
   else:
     print('Nothing to be done.')
   

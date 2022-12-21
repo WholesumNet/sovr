@@ -104,7 +104,7 @@ To get the Sovr CLI, fork it from Github:
 
 .. code-block:: console
 
-  git clone https://github.com/LickliderCircle/sovr.git
+  git clone https://github.com/rezahsnz/sovr.git
 
 If you needed any help, just invoke Sovr CLI with ``--help`` argument:
 
