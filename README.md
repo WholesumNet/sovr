@@ -22,14 +22,11 @@ optional arguments:
                         proceeding.
   --persist             Persist pod to dfs
   --fork FORK           Fork a public pod, a reference key is expected
-  --run                 Run the pod
+  --run                 Run the pod/task
   --import-pod IMPORT_POD
                         Imports a pod to local filesystem, a pod name is
                         expected
   --list-pods           List all pods
   --generate-pod-registry
                         Generate a new pod registry by looking into all pods
-  --task TASK           Fork, import, and finally run all compute pods
-                        requested in a task description file, a task
-                        description file is expected.
 </pre>
