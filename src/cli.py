@@ -479,8 +479,10 @@ def runTask(_cookie: str,
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Sovr command line interface')
   group = parser.add_mutually_exclusive_group()
+  parser.add_argument('--init', action='store_true',
+                      help = 'Walks you through a wizard to initialize a new pod or task.')
   parser.add_argument('--recipe',
-                      help = 'specify a recipe file')
+                      help = 'Specify a recipe file')
   parser.add_argument('--persist-self', action = 'store_true',
                       help = 'Persist the CLI itself and make it public. Caution: remove any credentials(password files, ...) before proceeding.')
   group.add_argument('--persist', action = 'store_true',
@@ -567,6 +569,88 @@ if __name__ == '__main__':
 
   elif args.generate_pod_registry:
     generatePodRegistry(_cookie = cookie, _password = creds['password'])
+
+  elif args.init:
+    print('This wizard walks you through the initialization of an empty Pod or Task.\n'
+          'Please remember that you can consult documentation at `https://http://sovr.rtfd.io`\n'
+          'Invalid answers will resolve to default values.\n'
+          'You will be asked a few questions, so let us begin.')
+    user_input = input('Is it a `pod` or a `task`? (default value is `pod`): ').lower()
+    is_pod = False if user_input == 'task' else True
+    project_type = 'Pod' if is_pod else 'Task'
+    project_name = input(f'Enter a name for your {project_type}: ')
+    project_desc = input(f'Enter the description for your {project_type}: ')
+    project_author = input(f'Enter the name of the author of your {project_type}: ')
+    user_input = input(f'Enter the version of your {project_type}, default value is `1.0`: ')
+    project_version = '1.0' if user_input == '' else user_input
+    user_input = input(f'Should your {project_type} be `public`? (default is `yes`): ').lower()
+    is_public = False if user_input == 'no' else True
+    if is_pod:
+      print('Now we are going to fill in the `Golem` properties of the Pod.')
+      golem_exec = input(f'What is the `exec` command to run the pod: ')
+      user_input = input('Do you have any external payloads? (default is `no`): ').lower()
+      payload_is_external = True if user_input == 'yes' else False
+      external_payloads = []
+      if payload_is_external:
+        payload_number = 1
+        payload_ref = input(f'Enter the reference key of the payload `{payload_number}` (empty aborts): ').lower()
+        paylaod_data_path = input(f'Enter the path of the data within the Pod`: ').lower()        
+        while payload_ref is not '':
+          external_payloads.append({
+              'ref': payload_ref.strip(),
+              'data': paylaod_data_path.strip()})
+          payload_number = payload_number + 1
+          payload_ref = input(f'Enter the reference key of the Pod containing the payload `{payload_number}`, (empty aborts): ').lower()
+          paylaod_data_path = input(f'Enter the path of the data within the Pod`: ').lower()
+      pod_recipe = {
+        'name': project_name.strip(),
+        'description': project_desc,
+        'author': project_author,
+        'version': project_version,
+        'public': is_public,
+        'golem': {
+          'exec': golem_exec,
+          'payload': 'payload' if not payload_is_external else external_payloads,
+          'output': 'output',
+          'logs': 'logs'
+        }
+      }
+      try:
+        os.mkdir(f'./{project_name}')
+        os.mkdir(f'./{project_name}/logs')
+        os.mkdir(f'./{project_name}/output')
+        os.mkdir(f'./{project_name}/payload')
+      except:
+        pass
+      with open(f'./{project_name}/recipe.json', 'w') as f:
+        f.write(json.dumps(pod_recipe, indent=2))      
+      print(f'Pod recipe is saved at `./{project_name}/recipe.json`')
+    else:
+      user_input = input('Do you have any external payloads? (default is `no`): ').lower()
+      payload_is_external = True if user_input == 'yes' else False
+      external_payloads = []
+      if payload_is_external:
+        payload_number = 1
+        payload_ref = input(f'Enter the reference key of the payload `{payload_number}`, (empty aborts): ').lower()
+        while payload_ref is not '':
+          external_payloads.append(payload_ref.strip())
+          payload_number = payload_number + 1
+          payload_ref = input(f'Enter the reference key of the Pod containing the payload `{payload_number}`, (empty aborts): ').lower()
+      task_recipe = {
+        'name': project_name.strip(),
+        'description': project_desc,
+        'author': project_author,
+        'version': project_version,
+        'public': is_public,
+        'pods': external_payloads
+      }
+      try:
+        os.mkdir(f'./{project_name}')
+      except:
+        pass
+      with open(f'./{project_name}/recipe.json', 'w') as f:
+        f.write(json.dumps(task_recipe, indent=2))      
+      print(f'Task recipe is saved at `./{project_name}/recipe.json`')      
     
   #elif args.task:
   #  task_path = f'{pathlib.Path(args.task).parent.resolve()}'

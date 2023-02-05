@@ -9,14 +9,16 @@ There is an essay about current efforts and future directions of computers here:
 
 ## CLI 
 <pre>
-usage: cli.py [-h] [--recipe RECIPE] [--persist-self]
-              [--persist | --fork FORK | --run | --import-pod IMPORT_POD | --list-pods | --generate-pod-registry | --task TASK]
+usage: cli.py [-h] [--init] [--recipe RECIPE] [--persist-self]
+              [--persist | --fork FORK | --run | --import-pod IMPORT_POD | --list-pods | --generate-pod-registry]
 
 Sovr command line interface
 
 optional arguments:
   -h, --help            show this help message and exit
-  --recipe RECIPE       specify a recipe file
+  --init                Walks you through a wizard to initialize a new pod or
+                        task.
+  --recipe RECIPE       Specify a recipe file
   --persist-self        Persist the CLI itself and make it public. Caution:
                         remove any credentials(password files, ...) before
                         proceeding.
@@ -29,4 +31,5 @@ optional arguments:
   --list-pods           List all pods
   --generate-pod-registry
                         Generate a new pod registry by looking into all pods
+
 </pre>
