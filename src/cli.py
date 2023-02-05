@@ -520,9 +520,9 @@ if __name__ == '__main__':
     exit()
 
   # login
-  # cookie = auth.login(creds['username'], creds['password'])
-  # if not cookie:
-  #   exit() 
+  cookie = auth.login(creds['username'], creds['password'])
+  if not cookie:
+    exit() 
   print('Successfully logged in.')
 
   # import recipe, if any  
