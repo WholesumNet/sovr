@@ -233,18 +233,18 @@ def importExternalPayload(_cookie: str,
     "exec": "python3 script/blender.py",
     "script": "script",
     "payload": [
-        {
-          "ref": "ej38b1...",
-          "data": "/data.zip"
-        },
-        {
-          "ref": "1a20fd...",
-          "data": "/jake/lime.zip"
-        },
-        .
-        .
-        .
-      ],
+      {
+        "ref": "ej38b1...",
+        "data": "/data.zip"
+      },
+      {
+        "ref": "1a20fd...",
+        "data": "/jake/lime.zip"
+      },
+      .
+      .
+      .
+    ],
     },
     .
     .
@@ -434,22 +434,34 @@ def runTask(_cookie: str,
             _task: dict,
             _base_path: str = '.') -> None:
   '''
-  Given a recipe file with the following structure, run compute pods
+  Given a task recipe file with the following structure, run compute pods
   one by one.
   {
     "name": "ML pipeline",
+    "payload": [
+      {
+        "ref": "a09bb8f37nf72d72739vj7lcn16bxw6xkw9xw983ep00eabx2",
+        "data": "/images.zip"
+      }
+    ],
     "pods": ["0xAA...AA", "0xBB...BB", ..., "0xZZ...ZZ"]
+    .
+    .
+    .
   }
   '''
   task_name = _task['name']
   print(f'Running task `{task_name}`...')
-  try:
-    os.mkdir(f'{_base_path}/{task_name}')
-  except:
-    pass
-
+  # try:
+  #   os.mkdir(f'{_base_path}/{task_name}')
+  # except:
+  #   pass
+  # copy external payload to each pod
+  if _task['payload']:
+    importExternalPayload(_cookie = _cookie, _password = _password,
+                          _where = _base_path, _payload = _task['payload'])
   prev_output = None
-  for pod_ref in _task['pods']:    
+  for pod_ref in _task['pods']:
     # fork
     pod_info = fork(_cookie = _cookie, _password = _password,
                     _reference = pod_ref, _where = _base_path)
@@ -464,11 +476,14 @@ def runTask(_cookie: str,
     if not recipe:
       print('Failed to finish task completely, recipe file '
             '`{recipe_path}` appears to be invalid.')
-      return 
-    # copy the output of the previous pod into the curren pod
+      return   
+    # copy the output of the previous pod into the current pod
+    # shutil.rmtree(path = f'{_base_path}/{pod_name}/payload/external', 
+    #               ignore_errors = True)
+    # put shared external paylaod
+    if _task['payload']:
+      shutil.copytree(src = f'{_base_path}/payload/external', dst = f'{_base_path}/{pod_name}/payload/external')
     if prev_output is not None:
-      shutil.rmtree(path = f'{_base_path}/{pod_name}/payload/external', 
-                    ignore_errors = True)
       shutil.copytree(src = prev_output, dst = f'{_base_path}/{pod_name}/payload/external')
     runPod(_cookie = _cookie, _password = _password,
            _recipe = recipe, _base_path = f'{_base_path}/{pod_name}')
