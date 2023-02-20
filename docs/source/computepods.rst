@@ -74,7 +74,7 @@ A compute pod is the main building block of the Sovr Protocol that provide an ea
 
 - *Running*
 
-  A running compute pod is simply a Golem program. An example of running a compute pod via Sovr CLI is shown below:
+  A running compute pod is simply a Golem program. An example of running a compute pod via Sovr CLI is shown below. Before running, Make sure you have `logs` and `payload` directories within your compute pod.
 
   .. code-block:: console
 
@@ -187,8 +187,11 @@ Where the ``pods`` property defines a list of compute pods that constitute the t
 
 Running a task involves forking and running individual compute pods. After each compute pod is run, the contents of the *output* is copied to the next compute pod's *payload/external* directory, thus enabling dependency of compute pods to each other. Sovr also enables tasks to have a special type of payload called the shared payload. A shared payload is a shared pod containing some data items that is provided to all pods when running, therefore making parallel evaluation workflows possible. There are many use cases where a single piece of data item is required to be evaluated by a several models, e.g. benchmarking purposes.  
 To sum it up, there are two ways for pods to make use of external data when part of a task:  
+
 - Relying on their own external paylaods specified in their recipe file.
-- ^ + Using a shared pod as external payload  
+
+- ^, + Using a shared pod as external payload  
+
 To get your feet wet with tasks, there is an example task in ``src/templates/tasks/ml/keras/recipe.json`` where 5 images are sent to different pre-trained Keras models to be classified.
 
 

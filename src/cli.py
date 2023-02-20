@@ -457,7 +457,7 @@ def runTask(_cookie: str,
   # except:
   #   pass
   # copy external payload to each pod
-  if _task['payload']:
+  if _task.get('payload'):
     importExternalPayload(_cookie = _cookie, _password = _password,
                           _where = _base_path, _payload = _task['payload'])
   prev_output = None
@@ -481,10 +481,14 @@ def runTask(_cookie: str,
     # shutil.rmtree(path = f'{_base_path}/{pod_name}/payload/external', 
     #               ignore_errors = True)
     # put shared external paylaod
-    if _task['payload']:
-      shutil.copytree(src = f'{_base_path}/payload/external', dst = f'{_base_path}/{pod_name}/payload/external')
+    if _task.get('payload'):
+      shutil.copytree(src = f'{_base_path}/payload/external',
+      dst = f'{_base_path}/{pod_name}/payload/external',
+      dirs_exist_ok = True)
     if prev_output is not None:
-      shutil.copytree(src = prev_output, dst = f'{_base_path}/{pod_name}/payload/external')
+      shutil.copytree(src = prev_output,
+                      dst = f'{_base_path}/{pod_name}/payload/external',
+                      dirs_exist_ok = True)
     runPod(_cookie = _cookie, _password = _password,
            _recipe = recipe, _base_path = f'{_base_path}/{pod_name}')
     prev_output = f'{_base_path}/{pod_name}/output'
@@ -516,9 +520,12 @@ if __name__ == '__main__':
   #                   help = 'Fork, import, and finally run all compute pods requested in a task description file, a task description file is expected.')
   args = parser.parse_args()
   
-  creds = None  
-  with open(f'{pathlib.Path(__file__).parent.resolve()}/creds.json', 'r') as f:
-    creds = json.loads(f.read())
+  creds = None 
+  try: 
+    with open(f'{pathlib.Path(__file__).parent.resolve()}/creds.json', 'r') as f:
+      creds = json.loads(f.read())
+  except IOError:
+    pass
   if not creds:
     print(
     """

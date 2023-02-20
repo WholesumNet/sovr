@@ -7,6 +7,10 @@ Prerequisites
 -------------
 There are few steps that need to be done before using the CLI:
 
+- **Python version**
+
+  Python 3 is the minimum version. But we recomend v3.8 to make sure that all features work.
+
 - **Swarm**
   
   To setup the Swarm node, you need to consult https://docs.ethswarm.org/docs. Once your node is up, fund your wallet(you can request funds from the Swarm discord), deploy a chequebook, and bingo! 
@@ -110,25 +114,26 @@ If you needed any help, just invoke Sovr CLI with ``--help`` argument:
 
 .. code-block:: console
 
-usage: cli.py [-h] [--init] [--recipe RECIPE] [--persist-self]
-              [--persist | --fork FORK | --run | --import-pod IMPORT_POD | --list-pods | --generate-pod-registry]
+  usage: cli.py [-h] [--init] [--recipe RECIPE] [--persist-self]
+                [--persist | --fork FORK | --run | --import-pod IMPORT_POD | --list-pods | --generate-pod-registry]
 
-Sovr command line interface
+  Sovr command line interface
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --init                Walks you through a wizard to initialize a new pod or
-                        task.
-  --recipe RECIPE       Specify a recipe file
-  --persist-self        Persist the CLI itself and make it public. Caution:
-                        remove any credentials(password files, ...) before
-                        proceeding.
-  --persist             Persist pod to dfs
-  --fork FORK           Fork a public pod, a reference key is expected
-  --run                 Run the pod/task
-  --import-pod IMPORT_POD
-                        Imports a pod to local filesystem, a pod name is
-                        expected
-  --list-pods           List all pods
-  --generate-pod-registry
-                        Generate a new pod registry by looking into all pods
+  optional arguments:
+    -h, --help            show this help message and exit
+    --init                Walks you through a wizard to initialize a new pod or
+                          task.
+    --recipe RECIPE       Specify a recipe file
+    --persist-self        Persist the CLI itself and make it public. Caution:
+                          remove any credentials(password files, ...) before
+                          proceeding.
+    --persist             Persist pod to dfs
+    --fork FORK           Fork a public pod, a reference key is expected
+    --run                 Run the pod/task
+    --import-pod IMPORT_POD
+                          Imports a pod to local filesystem, a pod name is
+                          expected
+    --list-pods           List all pods
+    --generate-pod-registry
+                          Generate a new pod registry by looking into all pods
+
