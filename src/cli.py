@@ -520,9 +520,12 @@ if __name__ == '__main__':
   #                   help = 'Fork, import, and finally run all compute pods requested in a task description file, a task description file is expected.')
   args = parser.parse_args()
   
-  creds = None  
-  with open(f'{pathlib.Path(__file__).parent.resolve()}/creds.json', 'r') as f:
-    creds = json.loads(f.read())
+  creds = None 
+  try: 
+    with open(f'{pathlib.Path(__file__).parent.resolve()}/creds.json', 'r') as f:
+      creds = json.loads(f.read())
+  except IOError:
+    pass
   if not creds:
     print(
     """
