@@ -74,7 +74,7 @@ A compute pod is the main building block of the Sovr Protocol that provide an ea
 
 - *Running*
 
-  A running compute pod is simply a Golem program. An example of running a compute pod via Sovr CLI is shown below:
+  A running compute pod is simply a Golem program. An example of running a compute pod via Sovr CLI is shown below. Before running, Make sure you have `logs` and `payload` directories within your compute pod.
 
   .. code-block:: console
 
